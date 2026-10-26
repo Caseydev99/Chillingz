@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "695269406899",
+    "project_id": "chillingz-dca92",
+    "storage_bucket": "chillingz-dca92.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:695269406899:android:72f57d21c86d1168ad18c6",
+        "android_client_info": {
+          "package_name": "com.chillingz.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDsoHbhQPJTz9xwP2BuNaqz2t8dE5zyUxo"
+        },
+        {
+          "current_key": "AIzaSyDxkze-SwLvCzbo27K1JNN-CStJ21ZMOSo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:695269406899:android:b28d30a721226da9ad18c6",
+        "android_client_info": {
+          "package_name": "com.chillingz.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDsoHbhQPJTz9xwP2BuNaqz2t8dE5zyUxo"
+        },
+        {
+          "current_key": "AIzaSyDxkze-SwLvCzbo27K1JNN-CStJ21ZMOSo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

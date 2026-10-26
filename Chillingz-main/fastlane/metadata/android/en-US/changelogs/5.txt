@@ -1,0 +1,7 @@
+What's new in this update:
+
+• Location is now optional. Tap "Not now" on the permission screen and browse the whole app without sharing your location — we'll remember your choice.
+• The "Current Location" bar is tappable at last: tap it to refresh where you are.
+• A fresh new app icon.
+• Clearer wording when something isn't available yet.
+• Behind the scenes: groundwork for smarter recommendations, plus stability fixes.

@@ -1,0 +1,52 @@
+name: Deploy web app to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Chillingz-main
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.8
+          cache: true
+
+      - run: flutter pub get
+
+      # Pages serves the site from /<repo-name>/, so the app's base href must match.
+      - run: flutter build web --release --base-href "/${{ github.event.repository.name }}/"
+
+      # Same step as the Firebase Hosting predeploy: ship the static legal pages too.
+      - run: cp -r public/. build/web/
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: Chillingz-main/build/web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

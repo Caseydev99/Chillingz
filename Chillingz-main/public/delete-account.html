@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Delete Your Chillingz Account</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #2D0D47;
+      --card: #4A1574;
+      --input: #3A105E;
+      --text: #FFFFFF;
+      --text-secondary: rgba(255,255,255,0.8);
+      --text-muted: rgba(255,255,255,0.6);
+      --accent-start: #9F3AF2;
+      --accent-end: #7925C7;
+      --danger: #D92D20;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--card);
+      border-radius: 24px;
+      padding: 40px 32px;
+    }
+    h1 {
+      font-size: 20px;
+      margin: 0 0 8px;
+      text-align: center;
+    }
+    p.lead {
+      color: var(--text-secondary);
+      font-size: 14px;
+      text-align: center;
+      margin: 0 0 28px;
+      line-height: 1.5;
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin: 16px 0 6px;
+    }
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: var(--input);
+      color: var(--text);
+      font-size: 14px;
+    }
+    input::placeholder { color: var(--text-muted); }
+    .warning {
+      margin-top: 24px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: rgba(217,45,32,0.15);
+      border: 1px solid rgba(217,45,32,0.4);
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+    .warning strong { color: var(--text); }
+    .checkbox-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .checkbox-row input { margin-top: 3px; }
+    .checkbox-row label {
+      margin: 0;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    button {
+      width: 100%;
+      margin-top: 24px;
+      padding: 14px;
+      border: none;
+      border-radius: 100px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      background-image: linear-gradient(90deg, var(--accent-start), var(--accent-end));
+      cursor: pointer;
+    }
+    button.danger {
+      background-image: none;
+      background-color: var(--danger);
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    button.secondary {
+      background-image: none;
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.25);
+      margin-top: 10px;
+    }
+    .message {
+      margin-top: 16px;
+      font-size: 13px;
+      text-align: center;
+      line-height: 1.5;
+    }
+    .message.error { color: #FF9B93; }
+    .message.success { color: #9BE8A8; }
+    .step { display: none; }
+    .step.active { display: block; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div id="step-signin" class="step active">
+      <h1>Delete your Chillingz account</h1>
+      <p class="lead">
+        Sign in with your Chillingz email and password to continue.
+        This lets us verify it's really you before deleting anything.
+      </p>
+      <label for="email">Email</label>
+      <input id="email" type="email" placeholder="you@example.com" autocomplete="email" />
+      <label for="password">Password</label>
+      <input id="password" type="password" placeholder="Your password" autocomplete="current-password" />
+      <button id="signin-btn">Sign in</button>
+      <p id="signin-message" class="message"></p>
+    </div>
+
+    <div id="step-confirm" class="step">
+      <h1>This action can't be undone</h1>
+      <p class="lead">Deleting your account will permanently remove:</p>
+      <div class="warning">
+        <strong>Your profile</strong> — name, photo, interests, and city<br />
+        <strong>Your account</strong> — email and sign-in credentials<br />
+        <strong>Your notifications</strong> — saved and delivered notification history
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="confirm-check" />
+        <label for="confirm-check">
+          I understand this permanently deletes my Chillingz account and data,
+          and cannot be undone.
+        </label>
+      </div>
+      <button id="delete-btn" class="danger" disabled>Delete my account</button>
+      <button id="cancel-btn" class="secondary">Cancel</button>
+      <p id="delete-message" class="message"></p>
+    </div>
+
+    <div id="step-done" class="step">
+      <h1>Account deleted</h1>
+      <p class="lead">
+        Your Chillingz account and data have been permanently deleted.
+        You can close this page.
+      </p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      signOut,
+    } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+    import {
+      getFunctions,
+      httpsCallable,
+    } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-functions.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBo3d9_sMFWuOd-mkyTV91DSPe4puM2dOk",
+      authDomain: "chillingz-dca92.firebaseapp.com",
+      projectId: "chillingz-dca92",
+      storageBucket: "chillingz-dca92.firebasestorage.app",
+      messagingSenderId: "695269406899",
+      appId: "1:695269406899:web:dfeffb9177d1d847ad18c6",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const functions = getFunctions(app, "us-central1");
+
+    const stepSignin = document.getElementById("step-signin");
+    const stepConfirm = document.getElementById("step-confirm");
+    const stepDone = document.getElementById("step-done");
+
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const signinBtn = document.getElementById("signin-btn");
+    const signinMessage = document.getElementById("signin-message");
+
+    const confirmCheck = document.getElementById("confirm-check");
+    const deleteBtn = document.getElementById("delete-btn");
+    const cancelBtn = document.getElementById("cancel-btn");
+    const deleteMessage = document.getElementById("delete-message");
+
+    function showStep(step) {
+      [stepSignin, stepConfirm, stepDone].forEach((el) => el.classList.remove("active"));
+      step.classList.add("active");
+    }
+
+    confirmCheck.addEventListener("change", () => {
+      deleteBtn.disabled = !confirmCheck.checked;
+    });
+
+    signinBtn.addEventListener("click", async () => {
+      signinMessage.textContent = "";
+      signinMessage.className = "message";
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+
+      if (!email || !password) {
+        signinMessage.textContent = "Enter your email and password.";
+        signinMessage.className = "message error";
+        return;
+      }
+
+      signinBtn.disabled = true;
+      signinBtn.textContent = "Signing in…";
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        showStep(stepConfirm);
+      } catch (error) {
+        signinMessage.textContent = friendlyAuthError(error.code);
+        signinMessage.className = "message error";
+      } finally {
+        signinBtn.disabled = false;
+        signinBtn.textContent = "Sign in";
+      }
+    });
+
+    cancelBtn.addEventListener("click", async () => {
+      await signOut(auth).catch(() => {});
+      passwordInput.value = "";
+      confirmCheck.checked = false;
+      deleteBtn.disabled = true;
+      deleteMessage.textContent = "";
+      showStep(stepSignin);
+    });
+
+    deleteBtn.addEventListener("click", async () => {
+      deleteMessage.textContent = "";
+      deleteMessage.className = "message";
+      deleteBtn.disabled = true;
+      deleteBtn.textContent = "Deleting…";
+
+      try {
+        const deleteMyAccount = httpsCallable(functions, "deleteMyAccount");
+        await deleteMyAccount();
+        showStep(stepDone);
+      } catch (error) {
+        deleteMessage.textContent =
+          "Something went wrong deleting your account. Please try again, or "
+          + "contact chillingzworldwide@gmail.com for help.";
+        deleteMessage.className = "message error";
+        deleteBtn.disabled = false;
+        deleteBtn.textContent = "Delete my account";
+      }
+    });
+
+    function friendlyAuthError(code) {
+      switch (code) {
+        case "auth/invalid-email":
+          return "Enter a valid email address.";
+        case "auth/invalid-credential":
+        case "auth/wrong-password":
+        case "auth/user-not-found":
+          return "Incorrect email or password.";
+        case "auth/too-many-requests":
+          return "Too many attempts. Please try again later.";
+        case "auth/network-request-failed":
+          return "Check your internet connection and try again.";
+        default:
+          return "Could not sign in. Please try again.";
+      }
+    }
+  </script>
+</body>
+</html>
