@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Offers and deals in London — Chillingz</title>
+  <meta name="description" content="Deals and members-only perks at restaurants, bars and things to do across London.">
+  <meta name="theme-color" content="#2d0d47">
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <link rel="manifest" href="manifest.json">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Chillingz">
+  <meta property="og:title" content="Offers and deals in London — Chillingz">
+  <meta property="og:description" content="Deals and members-only perks at restaurants, bars and things to do across London.">
+  <meta property="og:image" content="images/og-image.jpg">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+
+  <link rel="stylesheet" href="css/styles.css">
+  <script type="module" src="js/site.js"></script>
+  <script type="module" src="js/pages.js"></script>
+</head>
+<body>
+  <div data-site-header></div>
+
+  <main id="main" class="container content-page" data-page="offers">
+    <header class="page-intro">
+      <h1>Offers &amp; deals</h1>
+      <p>Perks and deals at places we love. Offers are added by venues and change often — always check the details with the venue.</p>
+    </header>
+    <!-- Filled from OFFERS in js/data.js -->
+    <section class="section" aria-label="Current offers" data-offers>
+      <p class="detail-loading">Loading…</p>
+    </section>
+    <section class="section">
+      <div class="app-banner">
+        <div>
+          <h2>Run a venue?</h2>
+          <p>Reach people looking for their next night out. Tell us about your offer and we'll feature it here and in the app.</p>
+        </div>
+        <a class="btn btn-primary" href="contact.html?topic=list-venue">Offer a deal</a>
+      </div>
+    </section>
+  </main>
+
+  <div data-site-footer></div>
+</body>
+</html>

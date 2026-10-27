@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chillingz — Things to do, food, drink and events in London</title>
+  <meta name="description" content="Discover the best things to do in London: restaurants, games, gigs, wellness and meetups. Browse, save and book as a guest — no sign-up needed.">
+  <meta name="theme-color" content="#2d0d47">
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <link rel="manifest" href="manifest.json">
+
+  <!-- How the page looks when shared on social media and in messages -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Chillingz">
+  <meta property="og:title" content="Chillingz — Things to do in London">
+  <meta property="og:description" content="Restaurants, games, gigs, wellness and meetups across London. Browse and book without signing up.">
+  <meta property="og:image" content="images/og-image.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- Start downloading the big photo straight away so it appears quickly -->
+  <link rel="preload" as="image" href="images/hero-1024.webp"
+    imagesrcset="images/hero-640.webp 640w, images/hero-1024.webp 1024w, images/hero-1600.webp 1600w, images/hero-2048.webp 2048w"
+    imagesizes="100vw" fetchpriority="high">
+
+  <!-- Inter font (the same font as the app) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+
+  <link rel="stylesheet" href="css/styles.css">
+  <script type="module" src="js/site.js"></script>
+  <script type="module" src="js/home.js"></script>
+
+  <!-- Information for search engines: who we are and how to search the site -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "name": "Chillingz",
+        "logo": "images/logo.png"
+      },
+      {
+        "@type": "WebSite",
+        "name": "Chillingz",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "search.html?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <div data-site-header></div>
+
+  <main id="main">
+
+    <!-- ===== Big welcome section with photo, search and three main buttons ===== -->
+    <section class="hero" aria-labelledby="hero-title">
+      <picture class="hero-photo">
+        <source type="image/webp" srcset="images/hero-640.webp 640w, images/hero-1024.webp 1024w, images/hero-1600.webp 1600w, images/hero-2048.webp 2048w" sizes="100vw">
+        <img src="images/hero-1024.jpg" alt="" width="1024" height="683" fetchpriority="high">
+      </picture>
+      <div class="container hero-content">
+        <h1 id="hero-title" data-home-text="heroTitle">Find your next favourite night out</h1>
+        <p class="hero-text" data-home-text="heroText">Restaurants, games, gigs, wellness and meetups across London. Browse, save and book — no sign-up needed.</p>
+
+        <form class="search-form hero-search" action="search.html" method="get" role="search" data-search-form>
+          <label class="visually-hidden" for="hero-search">What are you looking for?</label>
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          <input class="input" id="hero-search" name="q" type="search" placeholder="Try “brunch”, “karting” or “R&B”" autocomplete="off">
+          <button class="btn btn-primary" type="submit">Search</button>
+        </form>
+
+        <!-- Quick search buttons (filled from data.js) and recent searches -->
+        <div class="quick-searches" data-quick-searches></div>
+      </div>
+    </section>
+
+    <!-- The three main things people come to do -->
+    <section class="container cta-grid" aria-label="Start here">
+      <a class="cta-card" href="search.html?category=food-drinks">
+        <span class="cta-icon" aria-hidden="true">🍽️</span>
+        <span><strong>Book a Table</strong><span>Restaurants, cafés and bars</span></span>
+      </a>
+      <a class="cta-card" href="search.html?category=events">
+        <span class="cta-icon" aria-hidden="true">🎟️</span>
+        <span><strong>Find Events</strong><span>Gigs, shows and live music</span></span>
+      </a>
+      <a class="cta-card" href="search.html">
+        <span class="cta-icon" aria-hidden="true">📍</span>
+        <span><strong>Browse Venues</strong><span>Everything near you</span></span>
+      </a>
+    </section>
+
+    <!-- Message shown instead of listings when a city has none yet -->
+    <section class="container section" data-city-empty hidden>
+      <div class="notice">
+        <h2>Coming soon to <span data-city-name></span></h2>
+        <p>We're busy finding the best places here. In the meantime, have a look at what's on in London.</p>
+        <button class="btn btn-primary" type="button" data-switch-london>Show me London</button>
+      </div>
+    </section>
+
+    <div data-city-content>
+      <!-- ===== Category cards ===== -->
+      <section class="container section" aria-labelledby="categories-title">
+        <div class="section-head">
+          <h2 id="categories-title">Explore <span data-city-name>London</span></h2>
+        </div>
+        <ul class="category-grid" data-categories></ul>
+      </section>
+
+      <!-- ===== Trending ===== -->
+      <section class="container section" aria-labelledby="trending-title">
+        <div class="section-head">
+          <h2 id="trending-title">Trending now</h2>
+          <a href="search.html?sort=rating">See all</a>
+        </div>
+        <div class="row-slot" data-row="trending"></div>
+      </section>
+
+      <!-- ===== Top 10 ===== -->
+      <section class="section top10" aria-labelledby="top10-title">
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <h2 id="top10-title">Top 10 things to do in <span data-city-name>London</span></h2>
+              <p class="section-intro">The highest-rated experiences on Chillingz right now.</p>
+            </div>
+          </div>
+          <div class="row-slot" data-row="top10"></div>
+        </div>
+      </section>
+
+      <!-- ===== New to book ===== -->
+      <section class="container section" aria-labelledby="new-title">
+        <div class="section-head">
+          <h2 id="new-title">New to book</h2>
+          <a href="search.html?sort=newest">See all</a>
+        </div>
+        <div class="row-slot" data-row="new"></div>
+      </section>
+
+      <!-- ===== Event tickets ===== -->
+      <section class="container section" aria-labelledby="events-title">
+        <div class="section-head">
+          <h2 id="events-title">Hot event tickets</h2>
+          <a href="search.html?category=events">See all</a>
+        </div>
+        <div class="row-slot" data-row="events"></div>
+      </section>
+
+      <!-- ===== Guides ===== -->
+      <section class="container section" aria-labelledby="guides-title">
+        <div class="section-head">
+          <h2 id="guides-title">Guides &amp; best-of lists</h2>
+          <a href="guides.html">All guides</a>
+        </div>
+        <ul class="guide-grid" data-guides></ul>
+      </section>
+
+      <!-- ===== Photo gallery ===== -->
+      <section class="container section" aria-labelledby="gallery-title">
+        <div class="section-head">
+          <h2 id="gallery-title">London, the Chillingz way</h2>
+        </div>
+        <ul class="gallery" data-gallery></ul>
+      </section>
+    </div>
+
+    <!-- ===== Offers, vouchers and rewards ===== -->
+    <section class="container section" aria-labelledby="promos-title">
+      <div class="section-head">
+        <h2 id="promos-title">Offers, vouchers &amp; rewards</h2>
+      </div>
+      <ul class="promo-grid" data-promos></ul>
+    </section>
+
+    <!-- ===== The app ===== -->
+    <section class="container section">
+      <div class="app-banner">
+        <div>
+          <h2>Take Chillingz with you</h2>
+          <p>Your favourites and bookings follow you between the website and the Chillingz app — just log in with the same account.</p>
+        </div>
+        <a class="btn btn-primary" href="app/">Open the app</a>
+      </div>
+    </section>
+  </main>
+
+  <div data-site-footer></div>
+</body>
+</html>

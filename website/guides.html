@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Things to do in London: guides and best-of lists — Chillingz</title>
+  <meta name="description" content="Themed guides, top-rated lists and ideas for things to do in London — from competitive socialising to saunas, Pan-Asian food and live music.">
+  <meta name="theme-color" content="#2d0d47">
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <link rel="manifest" href="manifest.json">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Chillingz">
+  <meta property="og:title" content="Guides and best-of lists — Chillingz">
+  <meta property="og:image" content="images/og-image.jpg">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+
+  <link rel="stylesheet" href="css/styles.css">
+  <script type="module" src="js/site.js"></script>
+  <script type="module" src="js/guides.js"></script>
+</head>
+<body>
+  <div data-site-header></div>
+
+  <main id="main" class="container guides-page">
+    <header class="page-intro">
+      <h1>Things To Do: guides &amp; best-of lists</h1>
+      <p>Hand-picked themes, the top-rated places in every category, and ideas from the Chillingz blog.</p>
+    </header>
+
+    <section class="section" aria-labelledby="themed-title">
+      <div class="section-head"><h2 id="themed-title">Themed guides</h2></div>
+      <ul class="guide-grid" data-themed-guides></ul>
+    </section>
+
+    <section class="section" aria-labelledby="best-title">
+      <div class="section-head"><h2 id="best-title">Best of London</h2></div>
+      <ul class="guide-grid" data-best-of></ul>
+    </section>
+
+    <section class="section" aria-labelledby="blog-title">
+      <div class="section-head"><h2 id="blog-title">From the blog</h2></div>
+      <ul class="guide-grid" data-posts></ul>
+    </section>
+  </main>
+
+  <div data-site-footer></div>
+</body>
+</html>

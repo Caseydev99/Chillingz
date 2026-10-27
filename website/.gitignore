@@ -1,0 +1,5 @@
+# Made by scripts/export_content.py — rebuilt fresh on every deploy
+/data/
+/images/content/
+/sitemap.xml
+/robots.txt

@@ -1,8 +1,22 @@
-name: Deploy web app to GitHub Pages
+# Builds and publishes the Chillingz website to GitHub Pages.
+#
+# What ends up online (https://<your-user>.github.io/<repo>/):
+#   /           the website (website/ folder) with fresh content from Firebase
+#   /app/       the Flutter web version of the app
+#   /privacy-policy.html etc.   the app's legal pages (Chillingz-main/public)
+#
+# When it runs:
+#   - every push to main
+#   - every 3 hours, so new listings added in Firebase show up on the site
+#   - whenever you press "Run workflow" on the Actions tab
+
+name: Deploy website to GitHub Pages
 
 on:
   push:
     branches: [main]
+  schedule:
+    - cron: "17 */3 * * *"
   workflow_dispatch:
 
 permissions:
@@ -17,29 +31,56 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: Chillingz-main
     steps:
       - uses: actions/checkout@v4
 
-      - uses: subosito/flutter-action@v2
+      # --- 1. Website content: copy the app's listings and photos from Firebase
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: python -m pip install pillow
+
+      # SITE_URL is the address the site will have, for sitemap.xml and robots.txt
+      - run: python website/scripts/export_content.py
+        env:
+          SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+
+      # --- 2. Flutter app: only rebuilt when the app's code has changed.
+      # The scheduled content refreshes reuse the last build, which keeps
+      # them quick (and uses fewer GitHub Actions minutes).
+      - id: flutter-cache
+        uses: actions/cache@v4
+        with:
+          path: Chillingz-main/build/web
+          key: flutter-web-${{ hashFiles('Chillingz-main/lib/**', 'Chillingz-main/web/**', 'Chillingz-main/assets/**', 'Chillingz-main/pubspec.lock') }}
+
+      - if: steps.flutter-cache.outputs.cache-hit != 'true'
+        uses: subosito/flutter-action@v2
         with:
           channel: stable
           flutter-version: 3.47.8
           cache: true
 
-      - run: flutter pub get
+      # The app lives under /app/, so its base href must say so.
+      - if: steps.flutter-cache.outputs.cache-hit != 'true'
+        working-directory: Chillingz-main
+        run: |
+          flutter pub get
+          flutter build web --release --base-href "/${{ github.event.repository.name }}/app/"
 
-      # Pages serves the site from /<repo-name>/, so the app's base href must match.
-      - run: flutter build web --release --base-href "/${{ github.event.repository.name }}/"
-
-      # Same step as the Firebase Hosting predeploy: ship the static legal pages too.
-      - run: cp -r public/. build/web/
+      # --- 3. Put everything together in one folder
+      - run: |
+          mkdir -p _site
+          cp -r website/. _site/
+          rm -rf _site/scripts _site/.gitignore _site/README.md
+          cp -r Chillingz-main/public/. _site/
+          mkdir -p _site/app
+          cp -r Chillingz-main/build/web/. _site/app/
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: Chillingz-main/build/web
+          path: _site
 
   deploy:
     needs: build

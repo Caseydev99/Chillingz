@@ -53,5 +53,20 @@
 	<array>
 		<string>remote-notification</string>
 	</array>
+	<!-- Google Sign-In: lets Google hand the user back to the app after they
+	     pick an account. Replace the placeholder with REVERSED_CLIENT_ID from a
+	     GoogleService-Info.plist downloaded after enabling Google sign-in, and
+	     set GoogleSignInConfig.iosClientId (lib/core/constants). -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.REPLACE-WITH-REVERSED-CLIENT-ID</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Page not found — Chillingz</title>
+  <meta name="description" content="Sorry, we couldn't find that page.">
+  <meta name="robots" content="noindex">
+  <script>
+    // On github.io the site lives in a folder named after the repository
+    // (e.g. /Chillingz/); on your own domain it's the top level.
+    (function () {
+      var parts = location.pathname.split("/");
+      var root = location.hostname.endsWith("github.io") && parts[1] ? "/" + parts[1] + "/" : "/";
+      document.write('<base href="' + root + '">');
+    })();
+  </script>
+  <meta name="theme-color" content="#2d0d47">
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <link rel="manifest" href="manifest.json">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Chillingz">
+  <meta property="og:title" content="Page not found — Chillingz">
+  <meta property="og:description" content="Sorry, we couldn't find that page.">
+  <meta property="og:image" content="images/og-image.jpg">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+
+  <link rel="stylesheet" href="css/styles.css">
+  <script type="module" src="js/site.js"></script>
+</head>
+<body>
+  <div data-site-header></div>
+
+  <main id="main" class="container content-page">
+    <div class="notice not-found">
+      <p class="not-found-code" aria-hidden="true">404</p>
+      <h1>We couldn't find that page</h1>
+      <p>The link may be old, or the page may have moved. Try one of these instead:</p>
+      <div class="button-row">
+        <a class="btn btn-primary" href="index.html">Go to the homepage</a>
+        <a class="btn btn-secondary" href="search.html">Search everything</a>
+        <a class="btn btn-secondary" href="guides.html">Browse guides</a>
+      </div>
+    </div>
+  </main>
+
+  <div data-site-footer></div>
+</body>
+</html>

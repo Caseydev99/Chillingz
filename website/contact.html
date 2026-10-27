@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contact us — Chillingz</title>
+  <meta name="description" content="Get in touch with Chillingz: questions, booking help, gift vouchers, press, or listing your venue.">
+  <meta name="theme-color" content="#2d0d47">
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <link rel="manifest" href="manifest.json">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Chillingz">
+  <meta property="og:title" content="Contact us — Chillingz">
+  <meta property="og:description" content="Get in touch with Chillingz: questions, booking help, gift vouchers, press, or listing your venue.">
+  <meta property="og:image" content="images/og-image.jpg">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+
+  <link rel="stylesheet" href="css/styles.css">
+  <script type="module" src="js/site.js"></script>
+  <script type="module" src="js/pages.js"></script>
+</head>
+<body>
+  <div data-site-header></div>
+
+  <main id="main" class="container content-page" data-page="contact">
+    <header class="page-intro">
+      <h1>Contact us</h1>
+      <p>Questions, booking help, or want to list your venue? Send us a message, or email <a data-site-email href="mailto:chillingzworldwide@gmail.com">chillingzworldwide@gmail.com</a>.</p>
+    </header>
+
+    <div class="two-column">
+      <form class="account-card" novalidate data-form="contact">
+        <div class="field">
+          <label for="contact-topic">What's it about?</label>
+          <select class="input" id="contact-topic" name="topic"></select>
+        </div>
+        <div class="field">
+          <label for="contact-name">Your name</label>
+          <input class="input" id="contact-name" name="name" type="text" autocomplete="name" required>
+          <p class="field-error" id="contact-name-error"></p>
+        </div>
+        <div class="field">
+          <label for="contact-email">Email</label>
+          <input class="input" id="contact-email" name="email" type="email" autocomplete="email" required>
+          <p class="field-error" id="contact-email-error"></p>
+        </div>
+        <div class="field">
+          <label for="contact-phone">Phone <span class="small-print">(optional)</span></label>
+          <input class="input" id="contact-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel">
+          <p class="field-error" id="contact-phone-error"></p>
+        </div>
+        <div class="field">
+          <label for="contact-message">Message</label>
+          <textarea class="input" id="contact-message" name="message" rows="5" maxlength="3000" required></textarea>
+          <p class="field-error" id="contact-message-error"></p>
+        </div>
+        <p class="small-print">We'll use your details only to reply. See our <a href="privacy.html">privacy policy</a>.</p>
+        <p class="form-message" role="alert" data-form-message></p>
+        <button class="btn btn-primary btn-block" type="submit">Send message</button>
+      </form>
+
+      <aside class="account-card">
+        <h2>Quick answers</h2>
+        <p>Lots of questions are answered in our <a href="faqs.html">FAQs</a>.</p>
+        <h2>Email</h2>
+        <p><a data-site-email href="mailto:chillingzworldwide@gmail.com">chillingzworldwide@gmail.com</a></p>
+        <h2>Based in</h2>
+        <p>London, United Kingdom</p>
+      </aside>
+    </div>
+  </main>
+
+  <div data-site-footer></div>
+</body>
+</html>
