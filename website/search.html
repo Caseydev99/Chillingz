@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- search.js changes the title to match what's being searched, e.g. "Food & Drink in London" -->
+  <title>Search things to do in London — Chillingz</title>
+  <meta name="description" content="Search restaurants, bars, activities, gigs, wellness and meetups in London. Filter by type, area, date, price and category.">
+  <meta name="theme-color" content="#2d0d47">
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <link rel="manifest" href="manifest.json">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Chillingz">
+  <meta property="og:title" content="Search things to do in London — Chillingz">
+  <meta property="og:image" content="images/og-image.jpg">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+
+  <link rel="stylesheet" href="css/styles.css">
+  <script type="module" src="js/site.js"></script>
+  <script type="module" src="js/search.js"></script>
+</head>
+<body>
+  <div data-site-header></div>
+
+  <main id="main" class="container search-page">
+    <header class="search-head">
+      <h1 data-search-title>Search</h1>
+      <!-- Category shortcuts (filled by search.js) -->
+      <div class="category-tabs" role="group" aria-label="Category" data-category-tabs></div>
+    </header>
+
+    <div class="search-layout">
+
+      <!-- ===== Filters =====
+           On desktop this is a column on the left.
+           On phones and tablets it's hidden until "Filters" is tapped, then
+           it slides up from the bottom of the screen. -->
+      <div class="filters-backdrop" hidden data-filters-backdrop></div>
+      <aside class="filters-panel" id="filters-panel" aria-labelledby="filters-title" data-filters-panel>
+        <div class="filters-head">
+          <h2 id="filters-title">Filters</h2>
+          <button class="icon-btn filters-close" type="button" aria-label="Close filters" data-filters-close>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </div>
+
+        <form class="filters-form" data-filters-form>
+          <!-- What to search for -->
+          <div class="field">
+            <label for="filter-q">Keywords</label>
+            <input class="input" id="filter-q" name="q" type="search" placeholder="e.g. brunch, karaoke" autocomplete="off">
+          </div>
+
+          <!-- Places or events -->
+          <fieldset class="filter-group">
+            <legend>Type</legend>
+            <div class="segmented">
+              <label><input type="radio" name="type" value="" checked><span>All</span></label>
+              <label><input type="radio" name="type" value="places"><span>Places</span></label>
+              <label><input type="radio" name="type" value="events"><span>Events</span></label>
+            </div>
+          </fieldset>
+
+          <!-- Category (the same choices as the tabs at the top) -->
+          <div class="field">
+            <label for="filter-category">Category</label>
+            <select class="input" id="filter-category" name="category" data-category-select></select>
+          </div>
+
+          <!-- Subcategory, e.g. "Pan Asian" — the list depends on the category -->
+          <div class="field">
+            <label for="filter-sub">Kind of place</label>
+            <select class="input" id="filter-sub" name="sub" data-sub-select></select>
+          </div>
+
+          <!-- Area — only listings whose name mentions an area have one -->
+          <div class="field" data-area-field>
+            <label for="filter-area">Area</label>
+            <select class="input" id="filter-area" name="area" data-area-select></select>
+          </div>
+
+          <!-- When (only events have dates) -->
+          <div class="field">
+            <label for="filter-date">When</label>
+            <select class="input" id="filter-date" name="date">
+              <option value="">Any time</option>
+              <option value="today">Today</option>
+              <option value="weekend">This weekend</option>
+              <option value="week">Next 7 days</option>
+              <option value="month">Next 30 days</option>
+            </select>
+          </div>
+
+          <!-- Price -->
+          <fieldset class="filter-group">
+            <legend>Price from</legend>
+            <div class="chip-options">
+              <label><input type="radio" name="price" value="" checked><span>Any</span></label>
+              <label><input type="radio" name="price" value="0-15"><span>Under £15</span></label>
+              <label><input type="radio" name="price" value="15-30"><span>£15–30</span></label>
+              <label><input type="radio" name="price" value="30-60"><span>£30–60</span></label>
+              <label><input type="radio" name="price" value="60-"><span>£60+</span></label>
+            </div>
+          </fieldset>
+
+          <!-- Rating -->
+          <label class="checkbox-row">
+            <input type="checkbox" name="rated" value="4">
+            <span>Rated 4★ or more</span>
+          </label>
+
+          <!-- Vibe (the app's interest tags) -->
+          <fieldset class="filter-group">
+            <legend>Vibe</legend>
+            <div class="chip-options" data-tag-options></div>
+          </fieldset>
+
+          <div class="filters-actions">
+            <button class="btn btn-secondary" type="button" data-clear-filters>Clear all</button>
+            <!-- Only on phones: results update as you go, this just closes the panel -->
+            <button class="btn btn-primary filters-apply" type="button" data-filters-close>
+              Show <span data-result-count-button>results</span>
+            </button>
+          </div>
+        </form>
+      </aside>
+
+      <!-- ===== Results ===== -->
+      <section class="results" aria-labelledby="results-count">
+        <div class="results-bar">
+          <button class="btn btn-secondary filters-toggle" type="button" aria-controls="filters-panel" aria-expanded="false" data-filters-open>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+            Filters <span class="filter-count" data-filter-count hidden></span>
+          </button>
+          <p class="results-count" id="results-count" aria-live="polite" data-results-count>Loading…</p>
+          <div class="sort">
+            <label for="sort">Sort</label>
+            <select class="input" id="sort" name="sort" data-sort-select>
+              <option value="">Best match</option>
+              <option value="rating">Top rated</option>
+              <option value="newest">Newest</option>
+              <option value="soonest">Soonest date</option>
+              <option value="price-low">Price: low to high</option>
+              <option value="price-high">Price: high to low</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- The filters currently switched on, each with a × to remove it -->
+        <ul class="active-filters" aria-label="Active filters" data-active-filters></ul>
+
+        <ul class="results-grid" data-results></ul>
+
+        <div class="results-more">
+          <button class="btn btn-secondary" type="button" hidden data-load-more>Show more</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div data-site-footer></div>
+</body>
+</html>

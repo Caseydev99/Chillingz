@@ -4,12 +4,20 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../core/constants/google_sign_in_config.dart';
 import '../../../core/services/activity_tracking_service.dart';
 import '../../../core/services/notification_service.dart';
 import '../models/interest_option.dart';
 import '../services/tags_service.dart';
+
+/// Thrown when the user closes the Google account picker. Screens treat it as
+/// "nothing happened" rather than an error.
+class GoogleSignInCancelled implements Exception {
+  const GoogleSignInCancelled();
+}
 
 class AuthProvider extends ChangeNotifier {
   static const int minInterestSelection = 3;
@@ -38,6 +46,7 @@ class AuthProvider extends ChangeNotifier {
   final ActivityTrackingService _activityTracking =
       ActivityTrackingService.instance;
   late final Future<void> _sessionPreferenceFuture;
+  Future<void>? _googleSignInInitialization;
 
   bool _obscureSignInPassword = true;
   bool _obscureSignUpPassword = true;
@@ -67,6 +76,7 @@ class AuthProvider extends ChangeNotifier {
   bool get agreeToTerms => _agreeToTerms;
   bool get isLoading => _isLoading;
   bool get isLoadingInterests => _isLoadingInterests;
+  bool get isGoogleSignInAvailable => GoogleSignInConfig.isAvailable;
   List<String> get selectedInterests => List.unmodifiable(_selectedInterests);
   List<InterestOption> get interestOptions =>
       _remoteInterestOptions ?? _fallbackInterestOptions;
@@ -212,6 +222,91 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  /// Signs in with Google, creating the account on first use.
+  ///
+  /// The account is the same Firebase user the website creates for Google
+  /// sign-ins, so favourites and interests are shared. Returns `true` when the
+  /// user still needs to pick interests (a brand-new account, or one created
+  /// on the website that skipped that step).
+  Future<bool> signInWithGoogle() async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final user = (await _googleCredential()).user;
+      if (user == null) {
+        throw FirebaseAuthException(code: 'no-current-user');
+      }
+
+      _isGuest = false;
+      final needsInterests = await _ensureGoogleUserProfile(user);
+      await _recordLogin(user);
+      unawaited(_syncNotificationsForSignedInUser());
+      await _persistSession(user);
+      return needsInterests;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<UserCredential> _googleCredential() async {
+    // The Flutter web build uses Firebase's own Google pop-up.
+    if (kIsWeb) {
+      return _firebaseAuth.signInWithPopup(GoogleAuthProvider());
+    }
+
+    _googleSignInInitialization ??= GoogleSignIn.instance.initialize(
+      clientId: defaultTargetPlatform == TargetPlatform.iOS
+          ? GoogleSignInConfig.iosClientId
+          : null,
+      serverClientId: GoogleSignInConfig.webClientId,
+    );
+    await _googleSignInInitialization;
+
+    final GoogleSignInAccount account;
+    try {
+      account = await GoogleSignIn.instance.authenticate();
+    } on GoogleSignInException catch (error) {
+      if (error.code == GoogleSignInExceptionCode.canceled) {
+        throw const GoogleSignInCancelled();
+      }
+      rethrow;
+    }
+
+    final idToken = account.authentication.idToken;
+    if (idToken == null) {
+      throw FirebaseAuthException(
+        code: 'missing-id-token',
+        message: 'Google did not return a sign-in token. Please try again.',
+      );
+    }
+    return _firebaseAuth.signInWithCredential(
+      GoogleAuthProvider.credential(idToken: idToken),
+    );
+  }
+
+  /// Creates the profile for a first Google sign-in, the same way
+  /// [signUp] does. Returns whether interests still need choosing.
+  Future<bool> _ensureGoogleUserProfile(User user) async {
+    final userDocument = _firestore.collection('users').doc(user.uid);
+    final snapshot = await userDocument.get();
+
+    if (!snapshot.exists) {
+      await userDocument.set(
+        _newUserData(
+          user: user,
+          name: user.displayName ?? '',
+          tags: _selectedInterests,
+        ),
+        SetOptions(merge: true),
+      );
+      return true;
+    }
+
+    return snapshot.data()?['onboarding'] != true;
+  }
+
   Future<void> _saveNewUserProfile(User user, String displayName) async {
     if (displayName.isNotEmpty && displayName != user.displayName) {
       await user.updateDisplayName(displayName);
@@ -310,7 +405,20 @@ class AuthProvider extends ChangeNotifier {
     await _saveSessionPreference();
     await _clearStoredSession();
     await NotificationService.instance.removeCurrentTokenFromUser();
+    final usedGoogle =
+        currentUser?.providerData.any(
+          (provider) => provider.providerId == 'google.com',
+        ) ??
+        false;
     await _firebaseAuth.signOut();
+    if (usedGoogle && !kIsWeb && _googleSignInInitialization != null) {
+      // Forget the chosen Google account so the picker shows next time.
+      try {
+        await GoogleSignIn.instance.signOut();
+      } catch (_) {
+        // Firebase is already signed out; this only resets the picker.
+      }
+    }
     _selectedInterests.clear();
     notifyListeners();
   }
@@ -612,6 +720,12 @@ class AuthProvider extends ChangeNotifier {
       }
     }
 
+    if (error is GoogleSignInException) {
+      return error.code == GoogleSignInExceptionCode.clientConfigurationError
+          ? 'Google sign-in is not set up for this app yet.'
+          : 'Google sign-in failed. Please try again.';
+    }
+
     if (error is! FirebaseAuthException) {
       return error.toString();
     }
@@ -636,6 +750,12 @@ class AuthProvider extends ChangeNotifier {
         return 'Check your internet connection and try again.';
       case 'no-current-user':
         return 'Please sign in again to continue.';
+      case 'account-exists-with-different-credential':
+        return 'This email already has an account. Sign in with your email '
+            'and password instead.';
+      case 'popup-closed-by-user':
+      case 'cancelled-popup-request':
+        return 'Google sign-in was closed before it finished.';
       default:
         return error.message ?? 'Authentication failed. Please try again.';
     }

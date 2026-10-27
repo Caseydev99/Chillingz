@@ -1,0 +1,14 @@
+{
+  "name": "Chillingz",
+  "short_name": "Chillingz",
+  "description": "Things to do, food, drink and events in London.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#1a0829",
+  "theme_color": "#2d0d47",
+  "icons": [
+    { "src": "images/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "images/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

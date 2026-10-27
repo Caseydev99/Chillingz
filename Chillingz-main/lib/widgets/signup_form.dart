@@ -11,6 +11,7 @@ import '../core/widgets/custom_button.dart';
 import '../core/widgets/custom_text_field.dart';
 import '../routes/app_routes.dart';
 import '../features/auth/providers/auth_provider.dart';
+import 'social_login_widget.dart';
 
 class SignupForm extends StatefulWidget {
   const SignupForm({super.key});
@@ -201,6 +202,7 @@ class _SignupFormState extends State<SignupForm> {
                 isLoading: provider.isLoading,
                 onPressed: provider.isLoading ? null : () => _submit(provider),
               ),
+              const SocialLoginWidget(requireTermsAgreement: true),
               // TODO: re-enable guest flow once account-gating issue (5.1.1v)
               // is fully resolved.
               /*

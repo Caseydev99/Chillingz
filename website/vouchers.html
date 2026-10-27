@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gift vouchers — Chillingz</title>
+  <meta name="description" content="Give someone a great night out with a Chillingz gift voucher.">
+  <meta name="theme-color" content="#2d0d47">
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <link rel="manifest" href="manifest.json">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Chillingz">
+  <meta property="og:title" content="Gift vouchers — Chillingz">
+  <meta property="og:description" content="Give someone a great night out with a Chillingz gift voucher.">
+  <meta property="og:image" content="images/og-image.jpg">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+
+  <link rel="stylesheet" href="css/styles.css">
+  <script type="module" src="js/site.js"></script>
+  <script type="module" src="js/pages.js"></script>
+</head>
+<body>
+  <div data-site-header></div>
+
+  <main id="main" class="container content-page" data-page="vouchers">
+    <header class="page-intro">
+      <h1>Gift vouchers</h1>
+      <p>Give someone a great night out. Choose an amount and who it's for, and we'll email you a secure link to pay.</p>
+    </header>
+
+    <div class="two-column">
+      <form class="account-card" novalidate data-form="voucher">
+        <fieldset class="filter-group">
+          <legend>Amount</legend>
+          <div class="chip-options" data-amounts></div>
+        </fieldset>
+        <div class="field" data-other-amount hidden>
+          <label for="voucher-otherAmount">Other amount (£10–£500)</label>
+          <input class="input" id="voucher-otherAmount" name="otherAmount" type="number" min="10" max="500" step="5" inputmode="numeric">
+          <p class="field-error" id="voucher-otherAmount-error"></p>
+        </div>
+
+        <h2 class="form-subhead">Who's it for?</h2>
+        <div class="field">
+          <label for="voucher-recipientName">Their name</label>
+          <input class="input" id="voucher-recipientName" name="recipientName" type="text" autocomplete="off" required>
+          <p class="field-error" id="voucher-recipientName-error"></p>
+        </div>
+        <div class="field">
+          <label for="voucher-recipientEmail">Their email <span class="small-print">(optional — leave empty to send it to yourself)</span></label>
+          <input class="input" id="voucher-recipientEmail" name="recipientEmail" type="email" autocomplete="off">
+          <p class="field-error" id="voucher-recipientEmail-error"></p>
+        </div>
+        <div class="field">
+          <label for="voucher-sendOn">Send it on <span class="small-print">(optional)</span></label>
+          <input class="input" id="voucher-sendOn" name="sendOn" type="date">
+        </div>
+        <div class="field">
+          <label for="voucher-message">Message <span class="small-print">(optional)</span></label>
+          <textarea class="input" id="voucher-message" name="message" rows="3" maxlength="500" placeholder="Happy birthday! Dinner's on me."></textarea>
+        </div>
+
+        <h2 class="form-subhead">Your details</h2>
+        <div class="field">
+          <label for="voucher-name">Your name</label>
+          <input class="input" id="voucher-name" name="name" type="text" autocomplete="name" required>
+          <p class="field-error" id="voucher-name-error"></p>
+        </div>
+        <div class="field">
+          <label for="voucher-email">Your email</label>
+          <input class="input" id="voucher-email" name="email" type="email" autocomplete="email" required>
+          <p class="field-error" id="voucher-email-error"></p>
+        </div>
+        <p class="form-message" role="alert" data-form-message></p>
+        <button class="btn btn-primary btn-block" type="submit">Request voucher</button>
+        <p class="small-print booking-note">We never ask for card details on this page. You'll pay through a secure payment link.</p>
+      </form>
+
+      <aside class="account-card">
+        <h2>How vouchers work</h2>
+        <ol class="steps">
+          <li>Send this form — no account needed.</li>
+          <li>We email you a secure link to pay.</li>
+          <li>We send the voucher by email on the day you choose.</li>
+        </ol>
+        <p class="small-print">Questions? <a href="contact.html?topic=vouchers">Get in touch</a>.</p>
+      </aside>
+    </div>
+  </main>
+
+  <div data-site-footer></div>
+</body>
+</html>
