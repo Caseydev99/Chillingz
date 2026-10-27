@@ -246,14 +246,6 @@ a {
   background: var(--surface-2);
 }
 
-/* White button with the Google logo */
-.btn-google {
-  background: #fff;
-  color: #1f1f1f;
-  border-color: #dadce0;
-  width: 100%;
-}
-
 .btn-block {
   width: 100%;
 }
@@ -1093,23 +1085,6 @@ a.chip {
 
 .auth-panel[hidden] {
   display: none;
-}
-
-.auth-divider {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 18px 0;
-  color: var(--text-muted);
-  font-size: var(--text-sm);
-}
-
-.auth-divider::before,
-.auth-divider::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: var(--border);
 }
 
 .password-wrap {
