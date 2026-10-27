@@ -125,9 +125,10 @@ Only an owner of the `chillingz-dca92` Firebase project can make these changes.
 - [ ] **Authorised domains:** Authentication → Settings → Authorised domains →
       add `caseydev99.github.io` (and any custom domain). Login doesn't work on
       the live site until this is done.
-- [ ] **Google sign-in:** Authentication → Sign-in method → turn on **Google**.
-- [ ] **Google sign-in in the app.** The "Continue with Google" button stays
-      hidden on each platform until its ID is filled in:
+- [ ] **Google sign-in in the app (optional).** The website only offers
+      email and password. The app has a "Continue with Google" button, which
+      stays hidden on each platform until it's set up. To turn it on, first go
+      to Authentication → Sign-in method and turn on **Google**, then:
   1. **Android:** in Project settings → Your apps → Android, add the SHA-1
      fingerprints of the debug key, the upload key and Google Play's app
      signing key (Play Console → App integrity). Download the new
@@ -175,7 +176,7 @@ Only an owner of the `chillingz-dca92` Firebase project can make these changes.
       by itself. Search, filters, favourites and recent searches work.
       Booking, contact, voucher and newsletter forms check every field.
 - [x] **Login pop-up:** opens from the header and stays on the same page.
-      Log in, sign up, Google and forgot-password tabs; sign-up checks;
+      Log in, sign up and forgot-password tabs; sign-up checks;
       name and email filled in after a guest booking.
 - [x] **My Account:** "Log in to see this" for guests, and all five sections
       (checked with a pretend user).
@@ -192,7 +193,7 @@ Only an owner of the `chillingz-dca92` Firebase project can make these changes.
 
 **Still to check:**
 
-- [ ] **Real accounts:** logging in, signing up, Google sign-in, forgot
+- [ ] **Real accounts:** logging in, signing up, forgot
       password, favourites shared with the app, and sending real bookings and
       messages. These need the live site and the Firebase owner's changes above.
 - [ ] **Lighthouse scores** (aim: 90+). After deploying, open the site in
@@ -216,3 +217,6 @@ Only an owner of the `chillingz-dca92` Firebase project can make these changes.
   store them yet.
 - Online payment isn't set up. Booking and voucher forms send requests, and
   payment links are sent by email.
+- The website has no Google sign-in. Anyone who signed up in the app with
+  Google can use **Forgot password** on the website to add a password to the
+  same account, then log in with their email.

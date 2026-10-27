@@ -39,7 +39,7 @@ function loadApp() {
 }
 
 /* Gives back the login tools: the "auth" object plus every login function
-   the site uses (sign in, sign up, Google, sign out…). */
+   the site uses (sign in, sign up, sign out…). */
 export function loadAuth() {
   if (!authPromise) {
     authPromise = Promise.all([

@@ -1,7 +1,7 @@
 /* ==========================================================================
    auth.js — logging in, signing up and the account menu
    --------------------------------------------------------------------------
-   All the real security (passwords, Google sign-in, reset emails) is done by
+   All the real security (passwords and reset emails) is done by
    Firebase Authentication — the same accounts your app uses. This file only
    draws the pop-up and passes what people type to Firebase.
 
@@ -9,8 +9,7 @@
    • Shows "Log in / Sign up" in the header, or the account menu once logged in
    • Opens the login pop-up on top of the current page, so visitors never
      lose their place. When they finish, the pop-up closes and they carry on.
-   • Log in and sign up with email + password, "Continue with Google", and
-     "Forgot password"
+   • Log in and sign up with email + password, and "Forgot password"
    • After a first sign-up, asks for interests — the same step as the app
    • Creates the same user record in Firebase that the app creates, so the
      account works in both places
@@ -28,11 +27,6 @@ let currentUser = null;
 
 // The pop-up element, created the first time it is needed
 let dialog = null;
-
-// If someone tries Google but already has a password account with that
-// email, we keep Google's answer here until they log in with their password,
-// then join the two together.
-let pendingGoogleCredential = null;
 
 
 /* --------------------------------------------------------------------------
@@ -62,15 +56,7 @@ export function getCurrentUser() {
 export async function initAuth() {
   renderAccountArea(null);
   try {
-    const { auth, onAuthStateChanged, getRedirectResult } = await loadAuth();
-
-    // If Google sign-in had to use a full-page redirect (some phones block
-    // pop-ups), finish it off here when the visitor comes back.
-    getRedirectResult(auth)
-      .then((result) => {
-        if (result?.user) afterSignIn(result.user, { method: "google" });
-      })
-      .catch((error) => console.error("Google redirect sign-in failed", error));
+    const { auth, onAuthStateChanged } = await loadAuth();
 
     onAuthStateChanged(auth, (user) => {
       currentUser = user;
@@ -228,8 +214,6 @@ function buildDialog() {
           <p class="form-message" role="alert" data-form-message></p>
           <button class="btn btn-primary btn-block" type="submit">Log in</button>
         </form>
-        <div class="auth-divider">or</div>
-        <button class="btn btn-google" type="button" data-google>${ICONS.google} Continue with Google</button>
       </div>
 
       <!-- SIGN UP -->
@@ -262,8 +246,6 @@ function buildDialog() {
           <p class="form-message" role="alert" data-form-message></p>
           <button class="btn btn-primary btn-block" type="submit">Create account</button>
         </form>
-        <div class="auth-divider">or</div>
-        <button class="btn btn-google" type="button" data-google>${ICONS.google} Continue with Google</button>
         <p class="small-print" style="margin-top:12px">Your account also works in the Chillingz app.</p>
       </div>
 
@@ -324,11 +306,6 @@ function buildDialog() {
     input.type = showing ? "password" : "text";
     button.setAttribute("aria-pressed", String(!showing));
     button.setAttribute("aria-label", showing ? "Show password" : "Hide password");
-  });
-
-  // "Continue with Google" buttons
-  dialog.querySelectorAll("[data-google]").forEach((button) => {
-    button.addEventListener("click", () => signInWithGoogle(button));
   });
 
   // The four forms
@@ -410,7 +387,6 @@ function friendlyError(error) {
     "auth/invalid-email": "Please enter a valid email address.",
     "auth/too-many-requests": "Too many attempts. Please wait a few minutes and try again.",
     "auth/network-request-failed": "No internet connection. Please check it and try again.",
-    "auth/popup-closed-by-user": "Google sign-in was closed before it finished.",
     "auth/unauthorized-domain": "Login isn't switched on for this web address yet. Please try again later.",
     "auth/operation-not-allowed": "This way of logging in isn't switched on yet.",
   };
@@ -437,7 +413,7 @@ async function handleLogin(event) {
   try {
     const { auth, signInWithEmailAndPassword } = await loadAuth();
     const { user } = await signInWithEmailAndPassword(auth, email, password);
-    await afterSignIn(user, { method: "password" });
+    await afterSignIn(user);
   } catch (error) {
     setFormMessage(form, friendlyError(error));
   } finally {
@@ -473,56 +449,11 @@ async function handleSignup(event) {
     const { user } = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(user, { displayName: name });
     await createUserRecord(user, name);
-    await afterSignIn(user, { method: "password", isNew: true });
+    await afterSignIn(user, { isNew: true });
   } catch (error) {
     setFormMessage(form, friendlyError(error));
   } finally {
     setBusy(form, false);
-  }
-}
-
-
-/* --------------------------------------------------------------------------
-   Continue with Google
-   Opens Google's own sign-in window. If the browser blocks pop-ups (common on
-   phones), it switches to a full-page redirect and comes back here after.
-   -------------------------------------------------------------------------- */
-async function signInWithGoogle(button) {
-  const form = button.closest("[data-panel]").querySelector("form");
-  setFormMessage(form, "");
-  button.disabled = true;
-
-  try {
-    const { auth, GoogleAuthProvider, signInWithPopup, signInWithRedirect } = await loadAuth();
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: "select_account" });
-
-    try {
-      const result = await signInWithPopup(auth, provider);
-      await afterSignIn(result.user, { method: "google" });
-    } catch (error) {
-      if (error.code === "auth/popup-blocked" || error.code === "auth/operation-not-supported-in-this-environment") {
-        await signInWithRedirect(auth, provider);
-        return;
-      }
-      throw error;
-    }
-  } catch (error) {
-    if (error.code === "auth/account-exists-with-different-credential") {
-      // The email already has an account that uses a password. Ask them to
-      // log in with it once; Google is then linked to that same account.
-      const { GoogleAuthProvider } = await loadAuth();
-      pendingGoogleCredential = GoogleAuthProvider.credentialFromError(error);
-      showPanel("login");
-      const loginForm = dialog.querySelector('[data-form="login"]');
-      loginForm.elements.email.value = error.customData?.email ?? "";
-      setFormMessage(loginForm, "You already have an account with this email. Log in with your password and we'll link Google to it.");
-      loginForm.elements.password.focus();
-      return;
-    }
-    setFormMessage(form, friendlyError(error));
-  } finally {
-    button.disabled = false;
   }
 }
 
@@ -563,7 +494,7 @@ async function handleForgot(event) {
 /* Makes sure the person has a user record, records the login like the app
    does, then either asks for interests (new people) or closes the pop-up so
    they're back exactly where they were. */
-async function afterSignIn(user, { method, isNew = false }) {
+async function afterSignIn(user, { isNew = false } = {}) {
   let needsInterests = isNew;
 
   try {
@@ -571,7 +502,7 @@ async function afterSignIn(user, { method, isNew = false }) {
     const userRef = doc(db, "users", user.uid);
     const snapshot = await getDoc(userRef);
 
-    // First time this person has logged in anywhere (e.g. first Google login)
+    // No record yet (e.g. the account was made but saving the record failed)
     if (!snapshot.exists()) {
       await createUserRecord(user, user.displayName ?? "");
       needsInterests = true;
@@ -593,8 +524,6 @@ async function afterSignIn(user, { method, isNew = false }) {
     // Logging in still worked; only the extra details failed to save
     console.error("Could not update user record", error);
   }
-
-  if (method === "password") await linkPendingGoogle(user);
 
   if (needsInterests) {
     buildDialog();
@@ -629,22 +558,6 @@ async function createUserRecord(user, name) {
     signedUpOn: "web",
   }, { merge: true });
 }
-
-/* If someone tried Google first and was told to log in with their password,
-   link Google to their account now so next time either way works. */
-async function linkPendingGoogle(user) {
-  if (!pendingGoogleCredential) return;
-  const credential = pendingGoogleCredential;
-  pendingGoogleCredential = null;
-  try {
-    const { linkWithCredential } = await loadAuth();
-    await linkWithCredential(user, credential);
-    showToast("Google is now linked to your account");
-  } catch (error) {
-    console.error("Could not link Google", error);
-  }
-}
-
 
 /* --------------------------------------------------------------------------
    Interests (first sign-up only)
