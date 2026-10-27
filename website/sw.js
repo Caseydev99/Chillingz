@@ -38,7 +38,7 @@ const CORE_FILES = [
   "js/home.js",
   "images/logo.png",
   "images/logo.webp",
-  "images/favicon.png",
+  "images/favicon.png?v=2",
 ];
 
 /* First visit: save the core files. */
