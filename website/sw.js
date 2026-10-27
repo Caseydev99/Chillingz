@@ -12,11 +12,12 @@
    people see the latest version whenever they're online.
 
    When you change the website, nothing needs doing here: copies refresh by
-   themselves. Only change CACHE_VERSION if you want to throw away every
-   saved copy at once.
+   themselves. The exception is images, which are kept once saved: if you
+   replace an image but keep its file name (e.g. a new logo or icon), change
+   CACHE_VERSION (v2 → v3…) so everyone's saved copies are thrown away.
    ========================================================================== */
 
-const CACHE_VERSION = "v1";
+const CACHE_VERSION = "v2";
 const CACHE_NAME = `chillingz-${CACHE_VERSION}`;
 
 // Saved straight away on the first visit
