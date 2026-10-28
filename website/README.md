@@ -45,7 +45,7 @@ website/
    every deploy and every 3 hours, so new listings appear by themselves.
 2. **Pages** load `js/site.js` (header, footer, login) and their own script,
    which reads `data/content.json`.
-3. **People's data** (accounts, favourites, bookings, messages, newsletter
+3. **People's data** (accounts, favourites, messages, newsletter
    sign-ups) is read and written in Firebase directly, so it's always live.
    Access is controlled by `Chillingz-main/firestore.rules`.
 
@@ -144,19 +144,18 @@ Only an owner of the `chillingz-dca92` Firebase project can make these changes.
 - [ ] **Publish the database rules:** publish `Chillingz-main/firestore.rules`
       (`firebase deploy --only firestore:rules`, or paste them into Firestore →
       Rules). This turns on:
-  - `bookings`: booking and ticket requests
   - `enquiries`: contact form and gift voucher requests
   - `newsletterSignups`: the footer sign-up
 - [ ] **Someone handles requests:** nothing sends emails automatically yet.
-      Check the `bookings`, `enquiries` and `newsletterSignups` collections,
-      confirm bookings with venues, and import sign-ups into MailerLite.
+      Check the `enquiries` and `newsletterSignups` collections, reply to
+      messages, and import sign-ups into MailerLite.
 
 ## Before launch: content and legal
 
-- [ ] **Update the terms and privacy policy.** They say an account is required
-      and that Chillingz doesn't take bookings. They also don't mention booking
-      requests, contact messages or Firebase. Update both the website and app
-      copies.
+- [ ] **Update the terms and privacy policy.** They say an account is
+      required, which isn't true on the website. They also don't mention
+      contact messages, newsletter sign-ups or Firebase. Update both the
+      website and app copies.
 - [ ] Replace the placeholder blog posts (`POSTS`) and rewards wording (`REWARDS`).
 - [ ] Add real offers (`OFFERS`) and trust figures (`TRUST`) when you have them.
 - [ ] In Firebase: add descriptions, addresses and opening hours to listings.
@@ -174,11 +173,10 @@ Only an owner of the `chillingz-dca92` Firebase project can make these changes.
 - [x] **Light and dark mode** (follows the device setting).
 - [x] **Guests:** every page opens without logging in, and no pop-up appears
       by itself. Search, filters, favourites and recent searches work.
-      Booking, contact, voucher and newsletter forms check every field.
+      Contact, voucher and newsletter forms check every field.
 - [x] **Login pop-up:** opens from the header and stays on the same page.
-      Log in, sign up and forgot-password tabs; sign-up checks;
-      name and email filled in after a guest booking.
-- [x] **My Account:** "Log in to see this" for guests, and all five sections
+      Log in, sign up and forgot-password tabs; sign-up checks.
+- [x] **My Account:** "Log in to see this" for guests, and all four sections
       (checked with a pretend user).
 - [x] **Accessibility:** one main heading per page, labels on every field,
       named buttons, unique ids, a "Skip to content" link, a visible focus
@@ -194,8 +192,7 @@ Only an owner of the `chillingz-dca92` Firebase project can make these changes.
 **Still to check:**
 
 - [ ] **Real accounts:** logging in, signing up, forgot
-      password, favourites shared with the app, and sending real bookings and
-      messages. These need the live site and the Firebase owner's changes above.
+      password, favourites shared with the app, and sending real messages. These need the live site and the Firebase owner's changes above.
 - [ ] **Lighthouse scores** (aim: 90+). After deploying, open the site in
       Chrome → DevTools → Lighthouse, or use
       <https://pagespeed.web.dev>. Test the homepage, search and a venue page,
@@ -215,7 +212,10 @@ Only an owner of the `chillingz-dca92` Firebase project can make these changes.
   only use those.
 - Written reviews and opening hours aren't shown, because Firebase doesn't
   store them yet.
-- Online payment isn't set up. Booking and voucher forms send requests, and
+- Chillingz doesn't take bookings. Venue and event pages link to the
+  venue's own booking site or the organiser's ticket site (from the listing's
+  ticket or website link in Firebase).
+- Online payment isn't set up. The voucher form sends a request, and
   payment links are sent by email.
 - The website has no Google sign-in. Anyone who signed up in the app with
   Google can use **Forgot password** on the website to add a password to the

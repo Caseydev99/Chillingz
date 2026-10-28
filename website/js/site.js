@@ -186,7 +186,7 @@ function renderHeader() {
         <nav class="drawer-nav" aria-label="Mobile menu">
           <ul>
             <li><a href="index.html">Home</a></li>
-            <li><a href="search.html?category=food-drinks">Book a Table</a></li>
+            <li><a href="search.html?category=food-drinks">Food &amp; Drink</a></li>
             <li><a href="search.html?category=events">Find Events</a></li>
             <li><a href="search.html">Browse Venues</a></li>
             <li><a href="guides.html">Guides</a></li>
@@ -440,6 +440,10 @@ setUpCookieBanner();
 initFavourites();
 initNewsletter();
 initAuth();
+
+// Bookings used to be remembered on the visitor's device. The website no
+// longer takes bookings, so tidy away any copies left from before.
+storage.remove("chillingz.guestBookings");
 
 // Offline support: register the service worker (see sw.js). Browsers only
 // allow this on https:// addresses and on localhost.

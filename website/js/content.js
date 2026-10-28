@@ -78,7 +78,7 @@ export function trending(listings, count = 12) {
     .slice(0, count);
 }
 
-/* "New to Book": listings marked as new first, then the most recently added. */
+/* "New on Chillingz": listings marked as new first, then the most recently added. */
 export function newest(listings, count = 12) {
   return [...listings]
     .sort((a, b) => Number(b.isNew) - Number(a.isNew) || (b.createdAt ?? "").localeCompare(a.createdAt ?? ""))

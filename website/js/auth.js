@@ -74,7 +74,7 @@ export async function initAuth() {
 
 /* Opens the login pop-up. mode is "login", "signup" or "forgot".
    "message" is an optional line shown at the top, e.g. why we're asking.
-   "prefill" can fill in the name and email, e.g. after a guest booking. */
+   "prefill" can fill in the name and email ({ name, email }). */
 export function openAuthModal(mode = "login", { message = "", prefill = null } = {}) {
   buildDialog();
   showPanel(mode);
@@ -119,7 +119,7 @@ function renderAccountArea(user) {
     if (drawerSlot) {
       drawerSlot.innerHTML = `
         <button class="btn btn-primary btn-block" type="button" data-open-login>Log in / Sign up</button>
-        <p class="small-print" style="margin-top:8px">Optional — you can browse and book as a guest.</p>`;
+        <p class="small-print" style="margin-top:8px">Optional — you can browse as a guest.</p>`;
     }
     return;
   }
@@ -133,7 +133,6 @@ function renderAccountArea(user) {
 
   const accountLinks = `
     <a href="account.html#details">My details</a>
-    <a href="account.html#bookings">My bookings</a>
     <a href="account.html#favourites">My favourites</a>
     <a href="account.html#rewards">My rewards</a>
     <a href="account.html#emails">Email preferences</a>`;
@@ -156,7 +155,6 @@ function renderAccountArea(user) {
       <p class="drawer-heading">Hi ${escapeHtml(firstName)}</p>
       <nav class="drawer-nav" aria-label="Account"><ul>
         <li><a href="account.html#details">My account</a></li>
-        <li><a href="account.html#bookings">My bookings</a></li>
         <li><a href="account.html#favourites">My favourites</a></li>
       </ul></nav>
       <button class="btn btn-secondary btn-block" type="button" data-sign-out style="margin-top:16px">Log out</button>`;
