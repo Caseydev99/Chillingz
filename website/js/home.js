@@ -3,7 +3,7 @@
    --------------------------------------------------------------------------
    The homepage HTML already has the headings and empty boxes. This file
    loads the listings (content.js) and puts cards into each box:
-     categories, Trending, Top 10, New to book, Event tickets, Guides,
+     categories, Trending, Top 10, New on Chillingz, Hot events, Guides,
      the photo gallery and the offers tiles.
    When the visitor picks another city in the header, it all redraws.
    ========================================================================== */

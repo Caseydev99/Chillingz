@@ -2,22 +2,21 @@
    account.js — the My Account page
    --------------------------------------------------------------------------
    Guests see a friendly "Log in to see this" message (and anything they've
-   saved on this device). Logged-in members see five sections:
+   saved on this device). Logged-in members see four sections:
      #details    name, email, interests, password
-     #bookings   their booking and ticket requests
      #favourites the places they've saved (shared with the app)
      #rewards    Chillingz Rewards
      #emails     which emails they'd like from us
    The part after # in the address decides which section is open, so links
-   like account.html#bookings go straight to the right place.
+   like account.html#favourites go straight to the right place.
    ========================================================================== */
 
 import { REWARDS } from "./data.js";
-import { escapeHtml, showToast, storage } from "./utils.js";
+import { escapeHtml, showToast } from "./utils.js";
 import { whenAuthReady, signOutUser } from "./auth.js";
 import { loadAuth, loadFirestore, loadFunctions } from "./firebase.js";
 import { getFavouriteIds, updateHeartButtons } from "./favourites.js";
-import { loadContent, detailUrl } from "./content.js";
+import { loadContent } from "./content.js";
 import { listingCard } from "./cards.js";
 
 const box = document.querySelector("[data-account]");
@@ -25,7 +24,6 @@ const MIN_INTERESTS = 3;
 
 const SECTIONS = [
   { id: "details", label: "My details" },
-  { id: "bookings", label: "My bookings" },
   { id: "favourites", label: "My favourites" },
   { id: "rewards", label: "My rewards" },
   { id: "emails", label: "Email preferences" },
@@ -48,12 +46,12 @@ async function renderGuest() {
   box.innerHTML = `
     <div class="notice account-guest">
       <h2>Log in to see this</h2>
-      <p>Log in or create a free account to see your bookings, favourites and rewards — on the website and in the Chillingz app.</p>
+      <p>Log in or create a free account to see your favourites and rewards — on the website and in the Chillingz app.</p>
       <div class="button-row">
         <button class="btn btn-primary" type="button" data-open-login>Log in</button>
         <button class="btn btn-secondary" type="button" data-open-login="signup">Create an account</button>
       </div>
-      <p class="small-print">You don't need an account to browse or book.</p>
+      <p class="small-print">You don't need an account to browse.</p>
     </div>
     ${saved.length ? `
       <section class="section" aria-labelledby="device-favourites">
@@ -99,7 +97,7 @@ async function detailsHtml(user) {
         <label for="account-email">Email</label>
         <input class="input" id="account-email" type="email" value="${escapeHtml(user.email ?? "")}" readonly aria-describedby="account-email-note">
         <p class="small-print" id="account-email-note">
-          ${user.emailVerified ? "✓ Verified" : 'Not verified yet. <button class="link-btn" type="button" data-verify-email>Send verification email</button> — once verified, bookings you made as a guest with this email show up here too.'}
+          ${user.emailVerified ? "✓ Verified" : 'Not verified yet. <button class="link-btn" type="button" data-verify-email>Send verification email</button>'}
         </p>
       </div>
       <fieldset class="filter-group">
@@ -119,62 +117,6 @@ async function detailsHtml(user) {
         : "<p>You sign in with Google, so there's no Chillingz password to change.</p>"}
       <p style="margin-top:16px"><button class="btn btn-secondary" type="button" data-sign-out-account>Log out</button></p>
       <p class="small-print" style="margin-top:16px">Want to leave? <a href="delete-account.html">Delete my account</a> — this permanently removes your profile and sign-in from the website and the app.</p>
-    </div>`;
-}
-
-/* My bookings: requests made while logged in, plus (with a verified email)
-   requests made as a guest with the same email. */
-async function bookingsHtml(user) {
-  let bookings = [];
-  let failed = false;
-  try {
-    const { db, collection, query, where, getDocs } = await loadFirestore();
-    const lookups = [getDocs(query(collection(db, "bookings"), where("userId", "==", user.uid)))];
-    if (user.emailVerified && user.email) {
-      lookups.push(getDocs(query(collection(db, "bookings"), where("email", "==", user.email.toLowerCase()))));
-    }
-    const results = await Promise.all(lookups);
-    const byId = new Map();
-    results.forEach((snapshot) => snapshot.docs.forEach((bookingDoc) => byId.set(bookingDoc.id, { id: bookingDoc.id, ...bookingDoc.data() })));
-    bookings = [...byId.values()];
-  } catch (error) {
-    // Usually means the booking rules haven't been published in Firebase yet
-    console.error("Could not load bookings", error);
-    failed = true;
-  }
-
-  // Also include requests made in this browser that aren't in the list above
-  storage.get("chillingz.guestBookings", []).forEach((local) => {
-    if (!bookings.some((booking) => booking.id === local.id)) bookings.push({ ...local, status: "requested", deviceOnly: true });
-  });
-  bookings.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
-
-  const { listings } = await loadContent().catch(() => ({ listings: [] }));
-  const statusLabels = { requested: "Requested", confirmed: "Confirmed", cancelled: "Cancelled", declined: "Not available" };
-
-  const items = bookings.map((booking) => {
-    const listing = listings.find((item) => item.id === booking.listingId);
-    const when = booking.date
-      ? new Date(booking.date).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric" }) + (booking.time ? ` at ${booking.time}` : "")
-      : "";
-    const what = booking.kind === "tickets" ? `${booking.people} ${booking.people === 1 ? "ticket" : "tickets"}` : `Table for ${booking.people}`;
-    return `
-      <li class="booking-row">
-        <div>
-          <h3>${listing ? `<a href="${detailUrl(listing)}">${escapeHtml(booking.listingTitle)}</a>` : escapeHtml(booking.listingTitle)}</h3>
-          <p class="small-print">${escapeHtml(what)}${when ? ` · ${escapeHtml(when)}` : ""} · Ref ${escapeHtml(booking.id.slice(0, 8).toUpperCase())}</p>
-        </div>
-        <span class="status status-${escapeHtml(booking.status)}">${statusLabels[booking.status] ?? escapeHtml(booking.status)}</span>
-      </li>`;
-  }).join("");
-
-  return `
-    <div class="account-card">
-      <h2>My bookings</h2>
-      ${failed ? '<p class="form-message" data-type="error">We couldn\'t load your bookings just now. Please try again later.</p>' : ""}
-      ${bookings.length
-        ? `<ul class="booking-list">${items}</ul>`
-        : '<p>No bookings yet. <a href="search.html?category=food-drinks">Find somewhere to book</a>.</p>'}
     </div>`;
 }
 
@@ -213,7 +155,6 @@ function emailsHtml() {
   return `
     <form class="account-card" data-emails-form>
       <h2>Email preferences</h2>
-      <label class="checkbox-row"><input type="checkbox" checked disabled><span><strong>Booking updates</strong> — confirmations and changes to your bookings. These are always sent.</span></label>
       <label class="checkbox-row"><input type="checkbox" name="offers" ${prefs.offers ? "checked" : ""}><span><strong>Offers and deals</strong> — perks and discounts at places we love.</span></label>
       <label class="checkbox-row"><input type="checkbox" name="newsletter" ${prefs.newsletter ? "checked" : ""}><span><strong>The Chillingz newsletter</strong> — new places, guides and what's on.</span></label>
       <label class="checkbox-row"><input type="checkbox" name="updates" ${prefs.updates ? "checked" : ""}><span><strong>Chillingz updates</strong> — launch news and new features.</span></label>
@@ -258,7 +199,7 @@ function setUpSection(id, user) {
     }
   });
 
-  // Verification email (needed to see guest bookings made with this email)
+  // Verification email
   panel.querySelector("[data-verify-email]")?.addEventListener("click", async (event) => {
     try {
       const { sendEmailVerification } = await loadAuth();
@@ -292,7 +233,7 @@ function setUpSection(id, user) {
     event.preventDefault();
     const form = event.currentTarget;
     const message = form.querySelector("[data-form-message]");
-    const emailPreferences = { bookingUpdates: true, offers: form.elements.offers.checked, newsletter: form.elements.newsletter.checked, updates: form.elements.updates.checked, updatedAt: new Date().toISOString() };
+    const emailPreferences = { offers: form.elements.offers.checked, newsletter: form.elements.newsletter.checked, updates: form.elements.updates.checked, updatedAt: new Date().toISOString() };
     try {
       const { db, doc, setDoc } = await loadFirestore();
       await setDoc(doc(db, "users", user.uid), { emailPreferences }, { merge: true });
@@ -311,7 +252,7 @@ function setUpSection(id, user) {
 /* --------------------------------------------------------------------------
    Page layout: section menu + the open section
    -------------------------------------------------------------------------- */
-const builders = { details: detailsHtml, bookings: bookingsHtml, favourites: favouritesHtml, rewards: rewardsHtml, emails: emailsHtml };
+const builders = { details: detailsHtml, favourites: favouritesHtml, rewards: rewardsHtml, emails: emailsHtml };
 
 /* Shows one section (from the # in the address) and builds it the first time. */
 async function showSection(user) {
@@ -325,8 +266,8 @@ async function showSection(user) {
   });
 
   const panel = box.querySelector(`[data-panel="${id}"]`);
-  // Favourites and bookings are rebuilt each time, as they change often
-  if (!panel.dataset.built || id === "favourites" || id === "bookings") {
+  // Favourites are rebuilt each time, as they change often
+  if (!panel.dataset.built || id === "favourites") {
     panel.innerHTML = '<p class="detail-loading">Loading…</p>';
     panel.innerHTML = await builders[id](user);
     panel.dataset.built = "yes";

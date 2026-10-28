@@ -7,24 +7,19 @@
    The page shows:
      • the photo, name, rating, price and a heart to save it
      • "About", the details (where, phone, website), a map and the rating
-     • a booking form: "Book a table" for venues, "Request tickets" for events
+     • a card linking to the venue's own booking site, or the organiser's
+       ticket site (Chillingz doesn't take bookings itself)
      • "You might also like" — similar listings
-   Guests can book with just their name, email and phone number.
    ========================================================================== */
 
 import { CATEGORIES } from "./data.js";
-import { escapeHtml, showToast, ICONS, storage } from "./utils.js";
+import { escapeHtml, showToast, ICONS } from "./utils.js";
 import { isFavourite, updateHeartButtons } from "./favourites.js";
 import { getListing, listingsForCity, isEvent, isPast, detailUrl, inCategory } from "./content.js";
 import { listingImage, cardRow } from "./cards.js";
-import { getCurrentUser, openAuthModal } from "./auth.js";
-import { loadFirestore } from "./firebase.js";
 
 const page = document.querySelector("[data-detail]");
 const listingId = new URLSearchParams(location.search).get("id") ?? "";
-
-// Bookings this browser has made, so guests can see them again later
-const GUEST_BOOKINGS_KEY = "chillingz.guestBookings";
 
 
 /* --------------------------------------------------------------------------
@@ -34,12 +29,6 @@ const GUEST_BOOKINGS_KEY = "chillingz.guestBookings";
 /* "Saturday 8 November 2026" */
 function longDate(isoDate) {
   return new Date(isoDate).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
-}
-
-/* Today's date as "2026-10-26", the format date boxes use. */
-function todayIso() {
-  const now = new Date();
-  return new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
 }
 
 /* "www.rocketpadel.com/club" -> "rocketpadel.com" for showing links. */
@@ -126,24 +115,27 @@ function setPageInfo(listing) {
 
 
 /* --------------------------------------------------------------------------
-   The booking form
+   How to book
+   Chillingz doesn't take bookings: this card sends people to the venue's own
+   booking site or the organiser's ticket site.
    -------------------------------------------------------------------------- */
 
-/* Times people can pick for a table: 12:00 to 22:30, every half hour. */
-function timeOptions() {
-  const options = [];
-  for (let minutes = 12 * 60; minutes <= 22 * 60 + 30; minutes += 30) {
-    const time = `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`;
-    options.push(`<option value="${time}" ${time === "19:00" ? "selected" : ""}>${time}</option>`);
+/* Where to book: the ticket/booking link if there is one, else the website. */
+function bookingLink(listing) {
+  if (listing.links.ticket) {
+    return { href: listing.links.ticket, label: isEvent(listing) ? "Get tickets" : "Book on their site" };
   }
-  return options.join("");
+  if (listing.links.website) {
+    return { href: listing.links.website, label: "Visit their website" };
+  }
+  return null;
 }
 
-/* The HTML for the booking card on the right (or at the bottom on phones). */
-function bookingFormHtml(listing) {
+/* The card on the right (or below the details on phones). */
+function bookingCardHtml(listing) {
   const forTickets = isEvent(listing);
 
-  // An event that has already happened can't be booked
+  // An event that has already happened
   if (isPast(listing)) {
     return `
       <section class="booking-card" id="book" aria-labelledby="booking-title">
@@ -153,194 +145,18 @@ function bookingFormHtml(listing) {
       </section>`;
   }
 
-  const user = getCurrentUser();
-  const peopleOptions = Array.from({ length: forTickets ? 10 : 20 }, (_, index) => {
-    const number = index + 1;
-    return `<option value="${number}" ${number === 2 ? "selected" : ""}>${number} ${forTickets ? (number === 1 ? "ticket" : "tickets") : (number === 1 ? "person" : "people")}</option>`;
-  }).join("");
-
-  // Events with a fixed date don't ask for one
-  const whenFields = forTickets && listing.date
-    ? `<p class="booking-when"><strong>${escapeHtml(longDate(listing.date))}</strong>${listing.time ? ` · ${escapeHtml(listing.time)}` : ""}</p>
-       <input type="hidden" name="date" value="${listing.date.slice(0, 10)}">
-       <input type="hidden" name="time" value="${escapeHtml((listing.time || "").slice(0, 5))}">`
-    : `<div class="field-row">
-         <div class="field">
-           <label for="book-date">Date</label>
-           <input class="input" id="book-date" name="date" type="date" min="${todayIso()}" value="${todayIso()}" required>
-           <p class="field-error" id="book-date-error"></p>
-         </div>
-         <div class="field">
-           <label for="book-time">Time</label>
-           <select class="input" id="book-time" name="time">${timeOptions()}</select>
-         </div>
-       </div>`;
-
+  const link = bookingLink(listing);
+  const who = forTickets ? "the organiser" : "the venue";
   return `
     <section class="booking-card" id="book" aria-labelledby="booking-title">
-      <h2 id="booking-title">${forTickets ? "Request tickets" : "Book a table"}</h2>
+      <h2 id="booking-title">${forTickets ? "Tickets" : "How to book"}</h2>
       ${listing.priceLabel ? `<p class="booking-price">From <strong>${escapeHtml(listing.priceLabel)}</strong>${forTickets ? " per ticket" : " per person"}</p>` : ""}
-
-      <form novalidate data-booking-form>
-        ${whenFields}
-        <div class="field">
-          <label for="book-people">${forTickets ? "Tickets" : "Guests"}</label>
-          <select class="input" id="book-people" name="people">${peopleOptions}</select>
-        </div>
-        <div class="field">
-          <label for="book-name">Your name</label>
-          <input class="input" id="book-name" name="name" type="text" autocomplete="name" required value="${escapeHtml(user?.displayName ?? "")}">
-          <p class="field-error" id="book-name-error"></p>
-        </div>
-        <div class="field">
-          <label for="book-email">Email</label>
-          <input class="input" id="book-email" name="email" type="email" autocomplete="email" required value="${escapeHtml(user?.email ?? "")}">
-          <p class="field-error" id="book-email-error"></p>
-        </div>
-        <div class="field">
-          <label for="book-phone">Mobile number</label>
-          <input class="input" id="book-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required placeholder="07123 456789">
-          <p class="field-error" id="book-phone-error"></p>
-        </div>
-        <div class="field">
-          <label for="book-notes">Anything we should know? <span class="small-print">(optional)</span></label>
-          <textarea class="input" id="book-notes" name="notes" rows="2" maxlength="500" placeholder="Birthday, dietary needs, accessibility…"></textarea>
-        </div>
-        <label class="checkbox-row">
-          <input type="checkbox" name="consent" required>
-          <span>I agree to Chillingz sharing these details with the ${forTickets ? "organiser" : "venue"} to arrange this. <a href="privacy.html" target="_blank" rel="noopener">Privacy policy</a></span>
-        </label>
-        <p class="field-error" id="book-consent-error"></p>
-        <p class="form-message" role="alert" data-form-message></p>
-        <button class="btn btn-primary btn-block" type="submit">${forTickets ? "Request tickets" : "Request booking"}</button>
-        <p class="small-print booking-note">No account needed. ${forTickets ? "The organiser" : "The venue"} will confirm by email.</p>
-      </form>
-
-      ${listing.links.ticket || listing.links.website ? `
-        <div class="booking-alt">
-          <p class="small-print">Prefer to book directly?</p>
-          ${listing.links.ticket ? `<a class="btn btn-secondary btn-block" href="${escapeHtml(listing.links.ticket)}" target="_blank" rel="noopener">${forTickets ? "Buy on the ticket site" : "Book on their site"} ↗</a>` : ""}
-          ${!listing.links.ticket && listing.links.website ? `<a class="btn btn-secondary btn-block" href="${escapeHtml(listing.links.website)}" target="_blank" rel="noopener">Visit their website ↗</a>` : ""}
-        </div>` : ""}
+      ${forTickets && listing.date ? `<p class="booking-when"><strong>${escapeHtml(longDate(listing.date))}</strong>${listing.time ? ` · ${escapeHtml(listing.time)}` : ""}</p>` : ""}
+      ${link ? `<a class="btn btn-primary btn-block" href="${escapeHtml(link.href)}" target="_blank" rel="noopener">${link.label} ↗</a>` : ""}
+      <p class="small-print booking-note">${link
+        ? `${forTickets ? "Tickets are sold directly by" : "Bookings are made directly with"} ${who}, not through Chillingz.`
+        : `Contact ${who} directly to ${forTickets ? "get tickets" : "book"}.`}</p>
     </section>`;
-}
-
-/* Checks the booking form. Shows a red message under any box that needs
-   fixing and gives back true when everything is fine. */
-function checkBookingForm(form) {
-  const values = Object.fromEntries(new FormData(form));
-  const digits = (values.phone ?? "").replace(/[^\d]/g, "");
-  // In the same order as the form, so the first problem gets the focus
-  const errors = {
-    date: !form.elements.date || form.elements.date.type === "hidden" || (values.date && values.date >= todayIso()) ? "" : "Please choose today or a later date.",
-    name: values.name?.trim() ? "" : "Please enter your name.",
-    email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email?.trim() ?? "") ? "" : "Please enter a valid email address.",
-    phone: digits.length >= 7 && digits.length <= 15 && /^[\d\s+()-]+$/.test(values.phone) ? "" : "Please enter a valid phone number.",
-    consent: values.consent ? "" : "Please tick to agree so we can pass on your request.",
-  };
-
-  Object.entries(errors).forEach(([field, message]) => {
-    const box = form.querySelector(`#book-${field}-error`);
-    if (box) box.textContent = message;
-    const input = form.elements[field];
-    if (input && input.type !== "hidden") {
-      input.setAttribute("aria-invalid", message ? "true" : "false");
-      if (message) input.setAttribute("aria-describedby", `book-${field}-error`);
-    }
-  });
-
-  const firstProblem = Object.keys(errors).find((field) => errors[field]);
-  if (firstProblem) form.elements[firstProblem]?.focus();
-  return !firstProblem;
-}
-
-/* Saves the booking request in Firebase ("bookings" collection).
-   Gives back the new booking's reference. */
-async function saveBooking(listing, form) {
-  const values = Object.fromEntries(new FormData(form));
-  const user = getCurrentUser();
-  const { db, collection, addDoc, serverTimestamp } = await loadFirestore();
-  const booking = {
-    listingId: listing.id,
-    listingTitle: listing.title.slice(0, 200),
-    kind: isEvent(listing) ? "tickets" : "table",
-    name: values.name.trim().slice(0, 100),
-    email: values.email.trim().toLowerCase(),
-    phone: values.phone.trim(),
-    date: values.date ?? "",
-    time: values.time ?? "",
-    people: Number(values.people),
-    notes: (values.notes ?? "").trim().slice(0, 500),
-    userId: user?.uid ?? null,
-    status: "requested",
-    source: "web",
-    createdAt: serverTimestamp(),
-  };
-  const saved = await addDoc(collection(db, "bookings"), booking);
-
-  // Remember it in this browser too, so a guest can find it again
-  const remembered = storage.get(GUEST_BOOKINGS_KEY, []);
-  remembered.unshift({ id: saved.id, listingId: listing.id, listingTitle: listing.title, date: booking.date, time: booking.time, people: booking.people, kind: booking.kind });
-  storage.set(GUEST_BOOKINGS_KEY, remembered.slice(0, 20));
-  return { reference: saved.id.slice(0, 8).toUpperCase(), booking };
-}
-
-/* What people see after sending a request. Guests get a gentle offer to
-   create an account — never required. */
-function confirmationHtml(listing, { reference, booking }) {
-  const forTickets = booking.kind === "tickets";
-  const when = booking.date ? `${longDate(booking.date)}${booking.time ? ` at ${booking.time}` : ""}` : "";
-  const isGuest = !getCurrentUser();
-  return `
-    <div class="booking-done" tabindex="-1" data-booking-done>
-      <p class="booking-done-icon" aria-hidden="true">✓</p>
-      <h2>Request sent!</h2>
-      <p>${forTickets ? `${booking.people} ${booking.people === 1 ? "ticket" : "tickets"}` : `Table for ${booking.people}`} at <strong>${escapeHtml(listing.title)}</strong>${when ? `, ${escapeHtml(when)}` : ""}.</p>
-      <p>We'll email <strong>${escapeHtml(booking.email)}</strong> once it's confirmed. Your reference is <strong>${reference}</strong>.</p>
-      ${isGuest ? `
-        <div class="booking-upsell">
-          <p><strong>Want to keep track of it?</strong> Create a free account with the same email to see this booking in My Bookings, save favourites and use the app.</p>
-          <button class="btn btn-secondary btn-block" type="button" data-signup-after-booking>Create an account</button>
-          <p class="small-print">Totally optional — your booking is already sent.</p>
-        </div>` : '<p><a href="account.html#bookings">See it in My Bookings</a></p>'}
-    </div>`;
-}
-
-function setUpBookingForm(listing) {
-  const form = page.querySelector("[data-booking-form]");
-  const message = form.querySelector("[data-form-message]");
-
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    message.textContent = "";
-    if (!checkBookingForm(form)) return;
-
-    const button = form.querySelector('[type="submit"]');
-    const label = button.textContent;
-    button.disabled = true;
-    button.textContent = "Sending…";
-    try {
-      const result = await saveBooking(listing, form);
-      const card = page.querySelector(".booking-card");
-      card.innerHTML = confirmationHtml(listing, result);
-      card.querySelector("[data-booking-done]").focus();
-      card.querySelector("[data-signup-after-booking]")?.addEventListener("click", () => {
-        openAuthModal("signup", {
-          message: "Use the same email as your booking and it'll appear in My Bookings.",
-          prefill: { name: result.booking.name, email: result.booking.email },
-        });
-      });
-    } catch (error) {
-      console.error("Booking failed", error);
-      message.dataset.type = "error";
-      // "permission-denied" means online booking isn't switched on in Firebase yet
-      message.textContent = error.code === "permission-denied"
-        ? "Sorry — online booking isn't available just yet. Please use the venue's own website or email us and we'll sort it out."
-        : "Sorry, we couldn't send that. Please check your connection and try again.";
-      button.disabled = false;
-      button.textContent = label;
-    }
-  });
 }
 
 
@@ -412,6 +228,7 @@ function setUpCalendar(listing) {
    -------------------------------------------------------------------------- */
 function render(listing, similar) {
   const event = isEvent(listing);
+  const link = bookingLink(listing);
   const saved = isFavourite(listing.id);
   const category = categoryName(listing);
   const categorySlug = event ? "events" : listing.category;
@@ -506,7 +323,7 @@ function render(listing, similar) {
       </div>
 
       <aside class="detail-side">
-        ${bookingFormHtml(listing)}
+        ${bookingCardHtml(listing)}
       </aside>
     </div>
 
@@ -516,16 +333,17 @@ function render(listing, similar) {
         ${cardRow(similar, { id: "similar-title" })}
       </section>` : ""}
 
-    <!-- Phones only: a bar at the bottom that jumps to the booking form -->
+    <!-- Phones only: a bar at the bottom with the booking link -->
     <div class="book-bar">
       <div>
         ${listing.priceLabel ? `<strong>From ${escapeHtml(listing.priceLabel)}</strong>` : `<strong>${escapeHtml(listing.title)}</strong>`}
         ${listing.rating ? `<span class="small-print">★ ${listing.rating.toFixed(1)}</span>` : ""}
       </div>
-      <a class="btn btn-primary" href="#book">${isPast(listing) ? "Ended" : event ? "Get tickets" : "Book a table"}</a>
+      ${isPast(listing)
+        ? '<a class="btn btn-primary" href="#book">Ended</a>'
+        : link ? `<a class="btn btn-primary" href="${escapeHtml(link.href)}" target="_blank" rel="noopener">${link.label} ↗</a>` : ""}
     </div>`;
 
-  if (!isPast(listing)) setUpBookingForm(listing);
   setUpMap(listing);
   setUpShare(listing);
   setUpCalendar(listing);
@@ -579,10 +397,3 @@ async function start() {
 
 start();
 
-// Logging in while on the page fills in the name and email in the form
-document.addEventListener("chillingz:auth", ({ detail: { user } }) => {
-  const form = page.querySelector("[data-booking-form]");
-  if (!form || !user) return;
-  if (!form.elements.name.value) form.elements.name.value = user.displayName ?? "";
-  if (!form.elements.email.value) form.elements.email.value = user.email ?? "";
-});

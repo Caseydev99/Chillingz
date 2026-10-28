@@ -129,7 +129,7 @@ function pickHtml(listing, number) {
         ${details ? `<p class="card-details">${escapeHtml(details)}</p>` : ""}
         ${listing.rating ? `<p class="card-rating"><span aria-hidden="true">★</span> ${listing.rating.toFixed(1)}<span class="visually-hidden"> out of 5</span></p>` : ""}
         ${listing.description ? `<p>${escapeHtml(listing.description)}</p>` : ""}
-        <a class="btn btn-secondary" href="${detailUrl(listing)}">See details${listing.date ? " & tickets" : " & book"}</a>
+        <a class="btn btn-secondary" href="${detailUrl(listing)}">See details</a>
       </div>
     </li>`;
 }

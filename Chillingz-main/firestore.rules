@@ -96,43 +96,6 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // Booking and ticket requests from the website. Anyone, including
-    // guests, may send one, but only in the expected shape. People can read
-    // their own requests: by account, or by their verified email address (so
-    // a guest who later signs up with the same email can see past bookings).
-    match /bookings/{bookingId} {
-      function isValidNewBooking() {
-        let data = request.resource.data;
-        return data.keys().hasOnly([
-            'listingId', 'listingTitle', 'kind', 'name', 'email', 'phone',
-            'date', 'time', 'people', 'notes', 'userId', 'status', 'source',
-            'createdAt'
-          ])
-          && data.listingId is string && data.listingId.size() > 0 && data.listingId.size() <= 100
-          && data.listingTitle is string && data.listingTitle.size() <= 200
-          && data.kind in ['table', 'tickets']
-          && data.name is string && data.name.size() > 0 && data.name.size() <= 100
-          && data.email is string && data.email.matches('^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$') && data.email.size() <= 200
-          && data.phone is string && data.phone.size() >= 7 && data.phone.size() <= 30
-          && data.date is string && data.date.size() <= 10
-          && data.time is string && data.time.size() <= 5
-          && data.people is int && data.people >= 1 && data.people <= 20
-          && data.notes is string && data.notes.size() <= 500
-          && (data.userId == null || (request.auth != null && data.userId == request.auth.uid))
-          && data.status == 'requested'
-          && data.source == 'web'
-          && data.createdAt == request.time;
-      }
-
-      allow create: if isValidNewBooking();
-      allow read: if isAdmin()
-        || (request.auth != null && resource.data.userId == request.auth.uid)
-        || (request.auth != null
-            && request.auth.token.email_verified == true
-            && resource.data.email == request.auth.token.email);
-      allow update, delete: if isAdmin();
-    }
-
     // Messages from the website's contact form and gift voucher requests.
     // Anyone may send one; only admins can read them.
     match /enquiries/{enquiryId} {
@@ -142,7 +105,7 @@ service cloud.firestore {
             'topic', 'name', 'email', 'phone', 'message', 'details', 'userId',
             'source', 'createdAt'
           ])
-          && data.topic in ['general', 'booking', 'vouchers', 'list-venue', 'press', 'privacy']
+          && data.topic in ['general', 'vouchers', 'list-venue', 'press', 'privacy']
           && data.name is string && data.name.size() > 0 && data.name.size() <= 100
           && data.email is string && data.email.matches('^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$') && data.email.size() <= 200
           && data.phone is string && data.phone.size() <= 30

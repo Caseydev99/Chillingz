@@ -1568,7 +1568,7 @@ a.chip {
   border-style: dashed;
 }
 
-/* The three big buttons: Book a Table, Find Events, Browse Venues.
+/* The three big buttons: Food & Drink, Find Events, Browse Venues.
    They overlap the bottom of the photo slightly. */
 .cta-grid {
   position: relative;
@@ -2168,13 +2168,13 @@ a.chip {
 
 /* --------------------------------------------------------------------------
    12. Venue and event pages
-   Phones: everything in one column, with a "Book" bar fixed at the bottom.
-   Desktop (1024px+): details on the left, booking form on the right that
+   Phones: everything in one column, with a booking-link bar fixed at the bottom.
+   Desktop (1024px+): details on the left, booking card on the right that
    stays in view while scrolling.
    -------------------------------------------------------------------------- */
 .detail-page {
   padding-top: 16px;
-  padding-bottom: 88px;            /* room for the phone booking bar */
+  padding-bottom: 88px;            /* room for the phone booking-link bar */
 }
 
 .detail-loading {
@@ -2372,49 +2372,7 @@ textarea.input {
   text-align: center;
 }
 
-.booking-alt {
-  display: grid;
-  gap: 8px;
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border);
-}
-
-.booking-alt p {
-  margin: 0;
-}
-
-/* After sending a request */
-.booking-done {
-  text-align: center;
-}
-
-.booking-done:focus {
-  outline: none;
-}
-
-.booking-done-icon {
-  display: grid;
-  place-items: center;
-  width: 56px;
-  height: 56px;
-  margin: 0 auto 8px;
-  border-radius: 50%;
-  background: var(--success);
-  color: #fff;
-  font-size: 1.6rem;
-  font-weight: 800;
-}
-
-.booking-upsell {
-  margin-top: 16px;
-  padding: 16px;
-  border-radius: var(--radius-small);
-  background: var(--surface-2);
-  text-align: left;
-}
-
-/* Phone booking bar fixed to the bottom of the screen */
+/* Phone bar with the booking link, fixed to the bottom of the screen */
 .book-bar {
   position: fixed;
   left: 0;
@@ -2542,50 +2500,6 @@ textarea.input {
 
 .account-card .input[readonly] {
   background: var(--surface-2);
-}
-
-.booking-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.booking-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px 16px;
-  padding-block: 14px;
-  border-top: 1px solid var(--border);
-}
-
-.booking-row h3 {
-  margin: 0 0 2px;
-  font-size: var(--text-base);
-}
-
-.booking-row p {
-  margin: 0;
-}
-
-.status {
-  padding: 4px 12px;
-  border-radius: 999px;
-  background: var(--surface-2);
-  font-size: var(--text-sm);
-  font-weight: 700;
-}
-
-.status-confirmed {
-  background: color-mix(in srgb, var(--success) 18%, transparent);
-  color: var(--success);
-}
-
-.status-cancelled,
-.status-declined {
-  background: color-mix(in srgb, var(--error) 14%, transparent);
-  color: var(--error);
 }
 
 .steps {

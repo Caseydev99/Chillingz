@@ -32,7 +32,7 @@ export const CATEGORIES = [
    open a small drop-down. */
 export const MAIN_MENU = [
   { label: "Explore", megaMenu: true },
-  { label: "Book a Table", href: "search.html?category=food-drinks" },
+  { label: "Food & Drink", href: "search.html?category=food-drinks" },
   { label: "Events", href: "search.html?category=events" },
   { label: "Guides", href: "guides.html" },
   {
@@ -96,7 +96,7 @@ export const TRUST = {
 /* The words at the top of the homepage */
 export const HOME = {
   heroTitle: "Find your next favourite night out",
-  heroText: "Restaurants, games, gigs, wellness and meetups across London. Browse, save and book — no sign-up needed.",
+  heroText: "Restaurants, games, gigs, wellness and meetups across London. Browse and save your favourites — no sign-up needed.",
   // Little shortcut buttons under the search box
   quickSearches: ["Brunch", "Competitive socialising", "Rooftop", "Sauna", "R&B", "Coworking"],
 };
@@ -164,7 +164,7 @@ export const POSTS = [
       "## Set a budget everyone's happy with",
       "Share a rough price per person up front. Most Chillingz listings show a \"from\" price, so you can filter by budget before anyone falls in love with somewhere expensive.",
       "## Book early for bigger groups",
-      "Groups of six or more fill up fast, especially on Fridays and Saturdays. Send a booking request as soon as you have a rough headcount — you can usually adjust numbers later.",
+      "Groups of six or more fill up fast, especially on Fridays and Saturdays. Book with the venue as soon as you have a rough headcount — you can usually adjust numbers later.",
       "## Save a shortlist",
       "Tap the heart on a few options and share the links. Your favourites follow you between the website and the Chillingz app.",
     ],
@@ -197,8 +197,8 @@ export const POSTS = [
 export const REWARDS = {
   intro: "Chillingz Rewards is coming soon. Here's how it will work:",
   steps: [
-    "Book through Chillingz and earn points for every confirmed booking.",
-    "Unlock perks like priority booking and members-only offers.",
+    "Earn points as you discover, save and share places on Chillingz.",
+    "Unlock perks like members-only offers.",
     "Your points will appear here and in the app.",
   ],
 };
@@ -208,7 +208,7 @@ export const REWARDS = {
 export const PROMOS = [
   { title: "Offers & deals", text: "Members-only perks and seasonal deals at places we love.", href: "offers.html", cta: "See offers" },
   { title: "Gift vouchers", text: "Give someone a great night out.", href: "vouchers.html", cta: "Buy a voucher" },
-  { title: "Chillingz Rewards", text: "Earn points every time you book and unlock treats.", href: "rewards.html", cta: "How it works" },
+  { title: "Chillingz Rewards", text: "Earn points as you explore and unlock treats.", href: "rewards.html", cta: "How it works" },
 ];
 
 /* Short text about the company, shown in the footer */
@@ -235,27 +235,19 @@ export const VOUCHER_AMOUNTS = [25, 50, 75, 100];
 export const FAQS = [
   {
     question: "Do I need an account to use Chillingz?",
-    answer: "No. You can browse, search, save favourites on your device and send booking requests as a guest. An account lets you keep favourites and bookings in one place across the website and the app.",
+    answer: "No. You can browse, search and save favourites on your device as a guest. An account keeps your favourites in one place across the website and the app.",
   },
   {
-    question: "How does booking work?",
-    answer: "Pick a date, time and number of people on a venue's page and send a request with your name, email and phone number. We pass it to the venue, who confirm by email. Your booking is with the venue, not with Chillingz.",
-  },
-  {
-    question: "Does booking through Chillingz cost extra?",
-    answer: "No. Chillingz may earn a small commission from some partners, but it doesn't add anything to your price.",
+    question: "Can I book through Chillingz?",
+    answer: "No. Chillingz helps you find great places and events. Each venue or event page links to the venue's own booking site or the organiser's ticket site, and you book with them directly.",
   },
   {
     question: "Can I change or cancel a booking?",
-    answer: "Contact the venue directly using the details on their page, or get in touch with us and we'll help pass on the message.",
+    answer: "Contact the venue or organiser directly. Your booking is with them, not with Chillingz.",
   },
   {
     question: "Are my favourites the same on the app and the website?",
     answer: "Yes. Log in with the same account and your favourites and interests are shared between the Chillingz website and app.",
-  },
-  {
-    question: "Why can't I see a booking I made as a guest?",
-    answer: "Create an account with the same email you booked with and verify your email address. Your guest bookings will then appear in My Bookings.",
   },
   {
     question: "How do I list my venue or event?",
@@ -271,7 +263,6 @@ export const FAQS = [
    "List your venue" link in the footer. */
 export const CONTACT_TOPICS = [
   { id: "general", label: "General question" },
-  { id: "booking", label: "Help with a booking" },
   { id: "vouchers", label: "Gift vouchers" },
   { id: "list-venue", label: "List my venue or event" },
   { id: "press", label: "Press & partnerships" },

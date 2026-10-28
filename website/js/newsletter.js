@@ -103,7 +103,7 @@ async function handleSubmit(event) {
     // Members: tick the same boxes in My Account → Email preferences
     if (user) {
       await setDoc(doc(db, "users", user.uid), {
-        emailPreferences: { bookingUpdates: true, newsletter: lists.includes("newsletter"), updates: lists.includes("updates"), updatedAt: new Date().toISOString() },
+        emailPreferences: { newsletter: lists.includes("newsletter"), updates: lists.includes("updates"), updatedAt: new Date().toISOString() },
       }, { merge: true }).catch((error) => console.error("Could not update email preferences", error));
     }
 
