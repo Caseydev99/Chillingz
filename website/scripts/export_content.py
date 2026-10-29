@@ -59,7 +59,7 @@ IMAGE_DIR = WEBSITE_DIR / "images" / "content"
 # The website's public address, used in sitemap.xml and robots.txt.
 # GitHub sets SITE_URL automatically when it deploys (see the workflow);
 # change this default if you move the site to your own domain.
-SITE_URL = os.environ.get("SITE_URL", "https://caseydev99.github.io/Chillingz/").rstrip("/") + "/"
+SITE_URL = os.environ.get("SITE_URL", "https://chillingzworldwide.com/").rstrip("/") + "/"
 
 # Pages that should appear in search engines (account, 404 and offline don't)
 SITEMAP_PAGES = [
