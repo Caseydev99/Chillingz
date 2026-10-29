@@ -346,10 +346,7 @@ function renderFooter() {
       </div>`,
   ).join("");
 
-  const appLinks = [
-    SITE.appStoreUrl && `<a class="btn btn-secondary" href="${SITE.appStoreUrl}" rel="noopener">App Store</a>`,
-    SITE.playStoreUrl && `<a class="btn btn-secondary" href="${SITE.playStoreUrl}" rel="noopener">Google Play</a>`,
-  ].filter(Boolean).join("");
+  const appLinks = appStoreLinksHtml("btn-secondary");
 
   slot.outerHTML = `
     <footer class="site-footer">
@@ -373,6 +370,16 @@ function renderFooter() {
         </div>
       </div>
     </footer>`;
+}
+
+
+/* Buttons to the app on the App Store and Google Play (links in SITE in
+   data.js). Used in the footer and on the homepage. */
+export function appStoreLinksHtml(buttonClass = "btn-secondary") {
+  return [
+    SITE.appStoreUrl && `<a class="btn ${buttonClass}" href="${escapeHtml(SITE.appStoreUrl)}" rel="noopener" aria-label="Download Chillingz on the App Store">App Store</a>`,
+    SITE.playStoreUrl && `<a class="btn ${buttonClass}" href="${escapeHtml(SITE.playStoreUrl)}" rel="noopener" aria-label="Get Chillingz on Google Play">Google Play</a>`,
+  ].filter(Boolean).join("");
 }
 
 

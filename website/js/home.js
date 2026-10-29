@@ -10,7 +10,7 @@
 
 import { HOME, GUIDES, PROMOS, CATEGORIES, CITIES } from "./data.js";
 import { escapeHtml } from "./utils.js";
-import { getCity } from "./site.js";
+import { getCity, appStoreLinksHtml } from "./site.js";
 import { getRecentSearches, updateHeartButtons } from "./favourites.js";
 import { loadContent, listingsForCity, inCategory, trending, newest, eventTickets, topRated, guideListings, detailUrl } from "./content.js";
 import { cardRow, listingImage } from "./cards.js";
@@ -177,8 +177,15 @@ async function renderListings() {
   }
 }
 
+/* "Take Chillingz with you": buttons to the app stores. */
+function renderAppLinks() {
+  const slot = document.querySelector("[data-app-links]");
+  if (slot) slot.innerHTML = appStoreLinksHtml("btn-primary");
+}
+
 renderHero();
 renderPromos();
+renderAppLinks();
 renderListings();
 
 // Redraw when the visitor changes city in the header

@@ -216,8 +216,8 @@ export const SITE = {
   name: "Chillingz",
   tagline: "Find fun things to do, places to eat and events near you.",
   email: "chillingzworldwide@gmail.com",   // from the existing privacy policy and terms
-  appStoreUrl: "",      // add your App Store link here when you have it
-  playStoreUrl: "",     // add your Google Play link here when you have it
+  appStoreUrl: "https://apps.apple.com/gb/app/chillingz/id6766254665",
+  playStoreUrl: "https://play.google.com/store/apps/details?id=com.chillingz.app",
 };
 
 /* Offers & deals page. Only add REAL offers that the venue has agreed to.
