@@ -85,7 +85,8 @@ Then open <http://localhost:8090>. Press Ctrl+C in the terminal to stop.
 
 The workflow `.github/workflows/deploy-web.yml` publishes:
 
-- the website at `https://caseydev99.github.io/Chillingz/`
+- the website at `https://chillingzworldwide.com/` (the old
+  `caseydev99.github.io/Chillingz/` address forwards there)
 - the Flutter web app at `/app/`
 - the app's legal pages (`/privacy-policy.html` and others) at the top level
 
@@ -102,16 +103,16 @@ website to GitHub Pages → Run workflow**.
    under **Actions**.
 3. Open the site address and check the homepage shows listings.
 
-**Optional, using your own domain** (for example `chillingz.com`):
+**The domain** (`chillingzworldwide.com`, registered with GoDaddy):
 
-1. Add the domain under **Settings → Pages → Custom domain**, and follow
-   GitHub's DNS instructions.
-2. In the workflow, change `SITE_URL` to `https://chillingz.com/`. The default
-   in `scripts/export_content.py` can change too.
-3. Add the domain to Firebase's authorised domains (below).
-
-With your own domain, `robots.txt` also starts to work: search engines only
-read it at the very top of a domain, not inside `/Chillingz/`.
+- GoDaddy DNS has four `A` records for `@` (185.199.108.153, .109.153,
+  .110.153 and .111.153) and a `CNAME` for `www` → `caseydev99.github.io`.
+- It's set under **Settings → Pages → Custom domain**, with **Enforce HTTPS**
+  ticked.
+- The workflow asks GitHub for the address, so the sitemap, robots.txt and
+  the `/app/` version follow the domain by themselves. To change domain,
+  change it under Settings → Pages and in DNS, and add it to Firebase's
+  authorised domains (below).
 
 **Netlify or Vercel instead:** run `export_content.py` as the build command,
 publish the `website/` folder, and set the `SITE_URL` environment variable.
@@ -123,8 +124,9 @@ publish the `website/` folder, and set the `SITE_URL` environment variable.
 Only an owner of the `chillingz-dca92` Firebase project can make these changes.
 
 - [ ] **Authorised domains:** Authentication → Settings → Authorised domains →
-      add `caseydev99.github.io` (and any custom domain). Login doesn't work on
-      the live site until this is done.
+      add `chillingzworldwide.com`, `www.chillingzworldwide.com` and
+      `caseydev99.github.io`. Login doesn't work on the live site until this
+      is done.
 - [ ] **Google sign-in in the app (optional).** The website only offers
       email and password. The app has a "Continue with Google" button, which
       stays hidden on each platform until it's set up. To turn it on, first go
