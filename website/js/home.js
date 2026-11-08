@@ -4,11 +4,11 @@
    The homepage HTML already has the headings and empty boxes. This file
    loads the listings (content.js) and puts cards into each box:
      categories, Trending, Top 10, New on Chillingz, Hot events, Guides,
-     the photo gallery and the offers tiles.
+     the photo gallery and the app banner.
    When the visitor picks another city in the header, it all redraws.
    ========================================================================== */
 
-import { HOME, GUIDES, PROMOS, CATEGORIES, CITIES } from "./data.js";
+import { HOME, GUIDES, CATEGORIES, CITIES } from "./data.js";
 import { escapeHtml } from "./utils.js";
 import { getCity, appStoreLinksHtml } from "./site.js";
 import { getRecentSearches, updateHeartButtons } from "./favourites.js";
@@ -128,21 +128,6 @@ function renderGallery(listings) {
 
 
 /* --------------------------------------------------------------------------
-   Offers, vouchers and rewards tiles (from data.js)
-   -------------------------------------------------------------------------- */
-function renderPromos() {
-  $("[data-promos]").innerHTML = PROMOS
-    .map((promo) => `
-      <li class="promo-card">
-        <h3>${escapeHtml(promo.title)}</h3>
-        <p>${escapeHtml(promo.text)}</p>
-        <a class="btn btn-secondary" href="${promo.href}">${escapeHtml(promo.cta)}</a>
-      </li>`)
-    .join("");
-}
-
-
-/* --------------------------------------------------------------------------
    Put it all together
    -------------------------------------------------------------------------- */
 async function renderListings() {
@@ -184,7 +169,6 @@ function renderAppLinks() {
 }
 
 renderHero();
-renderPromos();
 renderAppLinks();
 renderListings();
 

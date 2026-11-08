@@ -63,9 +63,15 @@ SITE_URL = os.environ.get("SITE_URL", "https://chillingzworldwide.com/").rstrip(
 
 # Pages that should appear in search engines (account, 404 and offline don't)
 SITEMAP_PAGES = [
-    "", "search.html", "guides.html", "offers.html", "vouchers.html", "rewards.html",
+    "", "search.html", "guides.html", "rewards.html",
     "about.html", "contact.html", "faqs.html", "terms.html", "privacy.html", "cookies.html",
 ]
+
+# Listings to leave off the website (the app still shows them). Use the
+# listing's Firebase ID, which is the "id=" part of its page address.
+HIDDEN_LISTING_IDS = {
+    "r1XpUih251h9ZjMLxFgI",  # The Lion King
+}
 
 # Photo widths to make. Phones use the small one, big screens the large one.
 IMAGE_WIDTHS = [480, 960]
@@ -663,6 +669,7 @@ def main():
         + listings_from_listing_categories(collections["listingCategories"])
         + listings_from_genres(collections["genres"])
     )
+    listings = [listing for listing in listings if listing["id"] not in HIDDEN_LISTING_IDS]
     categories = categories_from(collections["categories"])
     subcategories = subcategories_from(collections["subcategories"])
 
