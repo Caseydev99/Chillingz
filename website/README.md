@@ -15,11 +15,11 @@ Firebase Authentication.
 ```
 website/
   index.html, search.html, venue.html, event.html, guides.html, article.html,
-  account.html, offers.html, vouchers.html, rewards.html, about.html,
+  account.html, rewards.html, about.html,
   contact.html, faqs.html, terms.html, privacy.html, cookies.html,
   404.html, offline.html        ← one file per page
   css/styles.css                ← all the styles (numbered sections inside)
-  js/data.js                    ← website words you can edit (menus, guides, FAQs, offers…)
+  js/data.js                    ← website words you can edit (menus, guides, FAQs…)
   js/site.js                    ← header, footer, menus, cookie banner (every page)
   js/auth.js                    ← login / sign-up pop-up
   js/favourites.js              ← hearts and recent searches
@@ -71,8 +71,8 @@ Then open <http://localhost:8090>. Press Ctrl+C in the terminal to stop.
 | Homepage words and quick searches     | `js/data.js` → `HOME`                            |
 | Guides                                | `js/data.js` → `GUIDES`                          |
 | Blog posts                            | `js/data.js` → `POSTS` (placeholders: replace them) |
-| Offers                                | `js/data.js` → `OFFERS` (only real, agreed offers) |
-| FAQs, contact topics, voucher amounts | `js/data.js` → `FAQS`, `CONTACT_TOPICS`, `VOUCHER_AMOUNTS` |
+| FAQs, contact topics                  | `js/data.js` → `FAQS`, `CONTACT_TOPICS`          |
+| Hide a listing from the website       | `scripts/export_content.py` → `HIDDEN_LISTING_IDS` |
 | Rewards wording                       | `js/data.js` → `REWARDS` (placeholder)           |
 | Review score / press mentions         | `js/data.js` → `TRUST` (real figures only; hidden while empty) |
 | Colours                               | `css/styles.css`, section 1                      |
@@ -146,7 +146,7 @@ Only an owner of the `chillingz-dca92` Firebase project can make these changes.
 - [ ] **Publish the database rules:** publish `Chillingz-main/firestore.rules`
       (`firebase deploy --only firestore:rules`, or paste them into Firestore →
       Rules). This turns on:
-  - `enquiries`: contact form and gift voucher requests
+  - `enquiries`: contact form messages
   - `newsletterSignups`: the footer sign-up
 - [ ] **Someone handles requests:** nothing sends emails automatically yet.
       Check the `enquiries` and `newsletterSignups` collections, reply to
@@ -159,7 +159,7 @@ Only an owner of the `chillingz-dca92` Firebase project can make these changes.
       contact messages, newsletter sign-ups or Firebase. Update both the
       website and app copies.
 - [ ] Replace the placeholder blog posts (`POSTS`) and rewards wording (`REWARDS`).
-- [ ] Add real offers (`OFFERS`) and trust figures (`TRUST`) when you have them.
+- [ ] Add trust figures (`TRUST`) when you have them.
 - [ ] In Firebase: add descriptions, addresses and opening hours to listings.
       Give listings their own photos (many share one), add ratings outside
       Things To Do, and mark some as featured or new.
@@ -172,10 +172,10 @@ Only an owner of the `chillingz-dca92` Firebase project can make these changes.
 
 - [x] **Screen sizes:** every page at 320, 375, 768, 1024, 1440 and 1920 px.
       No sideways scrolling, and no script errors.
-- [x] **Light and dark mode** (follows the device setting).
+- [x] **Colours:** one dark purple theme for everyone.
 - [x] **Guests:** every page opens without logging in, and no pop-up appears
       by itself. Search, filters, favourites and recent searches work.
-      Contact, voucher and newsletter forms check every field.
+      Contact and newsletter forms check every field.
 - [x] **Login pop-up:** opens from the header and stays on the same page.
       Log in, sign up and forgot-password tabs; sign-up checks.
 - [x] **My Account:** "Log in to see this" for guests, and all four sections
@@ -217,8 +217,6 @@ Only an owner of the `chillingz-dca92` Firebase project can make these changes.
 - Chillingz doesn't take bookings. Venue and event pages link to the
   venue's own booking site or the organiser's ticket site (from the listing's
   ticket or website link in Firebase).
-- Online payment isn't set up. The voucher form sends a request, and
-  payment links are sent by email.
 - The website has no Google sign-in. Anyone who signed up in the app with
   Google can use **Forgot password** on the website to add a password to the
   same account, then log in with their email.

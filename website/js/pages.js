@@ -1,15 +1,15 @@
 /* ==========================================================================
-   pages.js — the smaller pages: offers, vouchers, rewards, contact, FAQs
+   pages.js — the smaller pages: rewards, contact, FAQs
    --------------------------------------------------------------------------
-   Each of these pages has  <main data-page="offers">  (or "vouchers", …).
+   Each of these pages has  <main data-page="contact">  (or "rewards", "faqs").
    This file looks at that name and runs the matching function below.
    The words come from data.js, so you can edit them there.
 
-   The contact form and the voucher form send an "enquiry" to Firebase
+   The contact form sends an "enquiry" to Firebase
    (collection: enquiries). Only Chillingz admins can read them.
    ========================================================================== */
 
-import { OFFERS, VOUCHER_AMOUNTS, REWARDS, FAQS, CONTACT_TOPICS, SITE } from "./data.js";
+import { REWARDS, FAQS, CONTACT_TOPICS, SITE } from "./data.js";
 import { escapeHtml } from "./utils.js";
 import { getCurrentUser, whenAuthReady } from "./auth.js";
 import { loadFirestore } from "./firebase.js";
@@ -88,95 +88,6 @@ async function prefillFromAccount(form) {
   if (!user) return;
   if (form.elements.name && !form.elements.name.value) form.elements.name.value = user.displayName ?? "";
   if (form.elements.email && !form.elements.email.value) form.elements.email.value = user.email ?? "";
-}
-
-
-/* --------------------------------------------------------------------------
-   Offers
-   -------------------------------------------------------------------------- */
-async function offersPage() {
-  const today = new Date().toISOString().slice(0, 10);
-  const current = OFFERS.filter((offer) => !offer.ends || offer.ends >= today);
-
-  if (!current.length) {
-    $("[data-offers]").innerHTML = `
-      <div class="notice">
-        <h2>No offers right now</h2>
-        <p>We're lining up deals with venues across London. Create an account and switch on offer emails to hear first.</p>
-        <div class="button-row">
-          <button class="btn btn-primary" type="button" data-open-login="signup">Create an account</button>
-          <a class="btn btn-secondary" href="search.html">Browse places</a>
-        </div>
-      </div>`;
-    return;
-  }
-
-  const cards = await Promise.all(current.map(async (offer) => {
-    const listing = offer.listingId ? await getListing(offer.listingId) : null;
-    return `
-      <li>
-        <article class="guide-card">
-          ${listingImage(listing ?? {}, { sizes: "(min-width: 1024px) 33vw, 90vw" })}
-          <div class="card-body">
-            ${offer.ends ? `<p class="chip">Ends ${escapeHtml(new Date(offer.ends).toLocaleDateString("en-GB", { day: "numeric", month: "short" }))}</p>` : ""}
-            <h2 class="card-title">${listing ? `<a href="${detailUrl(listing)}">${escapeHtml(offer.title)}</a>` : escapeHtml(offer.title)}</h2>
-            <p class="card-details">${escapeHtml(offer.venue ?? listing?.title ?? "")}</p>
-            ${offer.details ? `<p class="small-print">${escapeHtml(offer.details)}</p>` : ""}
-          </div>
-        </article>
-      </li>`;
-  }));
-  $("[data-offers]").innerHTML = `<ul class="guide-grid">${cards.join("")}</ul>`;
-}
-
-
-/* --------------------------------------------------------------------------
-   Gift vouchers
-   No card details are taken here: we send a request, and Chillingz replies
-   with a secure payment link from a payment provider.
-   -------------------------------------------------------------------------- */
-function vouchersPage() {
-  const form = $("[data-form='voucher']");
-  form.querySelector("[data-amounts]").innerHTML = VOUCHER_AMOUNTS
-    .map((amount, index) => `<label><input type="radio" name="amount" value="${amount}" ${index === 1 ? "checked" : ""}><span>£${amount}</span></label>`)
-    .join("") + '<label><input type="radio" name="amount" value="other"><span>Other amount</span></label>';
-
-  // Show the "other amount" box only when "Other amount" is picked
-  const otherField = form.querySelector("[data-other-amount]");
-  form.addEventListener("change", () => {
-    otherField.hidden = form.elements.amount.value !== "other";
-  });
-  prefillFromAccount(form);
-
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const isOther = form.elements.amount.value === "other";
-    const ok = checkForm(form, {
-      ...(isOther ? { otherAmount: (value) => (Number(value) >= 10 && Number(value) <= 500 ? "" : "Please choose an amount between £10 and £500.") } : {}),
-      recipientName: (value) => (value ? "" : "Please enter who it's for."),
-      recipientEmail: (value) => (!value || looksLikeEmail(value) ? "" : "Please enter a valid email address, or leave it empty."),
-      name: (value) => (value ? "" : "Please enter your name."),
-      email: (value) => (looksLikeEmail(value) ? "" : "Please enter a valid email address."),
-    });
-    if (!ok) return;
-
-    const amount = isOther ? Number(form.elements.otherAmount.value) : Number(form.elements.amount.value);
-    const values = Object.fromEntries(new FormData(form));
-    submitWithFeedback(form, () => sendEnquiry({
-      topic: "vouchers",
-      name: values.name.trim(),
-      email: values.email.trim(),
-      message: values.message.trim() || `Gift voucher for ${values.recipientName.trim()}`,
-      details: {
-        amount,
-        recipientName: values.recipientName.trim().slice(0, 100),
-        recipientEmail: values.recipientEmail.trim().slice(0, 200),
-        sendOn: values.sendOn || "",
-      },
-    }), `
-      <h2>Thanks — request received</h2>
-      <p>We'll email <strong>${escapeHtml(values.email.trim())}</strong> a secure link to pay for your £${amount} voucher, then send it ${values.recipientEmail.trim() ? `to ${escapeHtml(values.recipientEmail.trim())}` : "to you"}${values.sendOn ? ` on ${escapeHtml(new Date(values.sendOn).toLocaleDateString("en-GB", { day: "numeric", month: "long" }))}` : ""}.</p>`);
-  });
 }
 
 
@@ -261,5 +172,5 @@ function faqsPage() {
 /* --------------------------------------------------------------------------
    Start the right one
    -------------------------------------------------------------------------- */
-const pages = { offers: offersPage, vouchers: vouchersPage, rewards: rewardsPage, contact: contactPage, faqs: faqsPage };
+const pages = { rewards: rewardsPage, contact: contactPage, faqs: faqsPage };
 pages[main.dataset.page]?.();

@@ -162,7 +162,7 @@ function renderHeader() {
           <form class="search-form" action="search.html" method="get" role="search" data-search-form>
             <label class="visually-hidden" for="site-search">Search venues and events</label>
             ${ICONS.search}
-            <input class="input" id="site-search" name="q" type="search" placeholder="Search bars, events, brunch…" value="${escapeHtml(query)}" autocomplete="off">
+            <input class="input" id="site-search" name="q" type="search" placeholder="How do you wanna chill today?" value="${escapeHtml(query)}" autocomplete="off">
           </form>
         </div>
 
@@ -186,7 +186,6 @@ function renderHeader() {
         <nav class="drawer-nav" aria-label="Mobile menu">
           <ul>
             <li><a href="index.html">Home</a></li>
-            <li><a href="search.html?category=food-drinks">Food &amp; Drink</a></li>
             <li><a href="search.html?category=events">Find Events</a></li>
             <li><a href="search.html">Browse Venues</a></li>
             <li><a href="guides.html">Guides</a></li>
@@ -197,8 +196,6 @@ function renderHeader() {
           </ul>
           <p class="drawer-heading">Treat yourself</p>
           <ul>
-            <li><a href="offers.html">Offers &amp; deals</a></li>
-            <li><a href="vouchers.html">Gift vouchers</a></li>
             <li><a href="rewards.html">Rewards</a></li>
           </ul>
         </nav>

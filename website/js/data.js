@@ -12,8 +12,6 @@
    the others are placeholders so you can see the switcher working. */
 export const CITIES = [
   { id: "london", name: "London" },
-  { id: "manchester", name: "Manchester" },
-  { id: "birmingham", name: "Birmingham" },
 ];
 
 /* The categories used in menus. "slug" must match the category's "slug"
@@ -32,17 +30,8 @@ export const CATEGORIES = [
    open a small drop-down. */
 export const MAIN_MENU = [
   { label: "Explore", megaMenu: true },
-  { label: "Food & Drink", href: "search.html?category=food-drinks" },
   { label: "Events", href: "search.html?category=events" },
   { label: "Guides", href: "guides.html" },
-  {
-    label: "Offers",
-    children: [
-      { label: "Offers & deals", href: "offers.html" },
-      { label: "Gift vouchers", href: "vouchers.html" },
-      { label: "Rewards", href: "rewards.html" },
-    ],
-  },
 ];
 
 /* Links in the footer, grouped into columns */
@@ -59,8 +48,6 @@ export const FOOTER_LINKS = [
   {
     heading: "Treat yourself",
     links: [
-      { label: "Offers", href: "offers.html" },
-      { label: "Gift vouchers", href: "vouchers.html" },
       { label: "Rewards", href: "rewards.html" },
       { label: "My account", href: "account.html" },
     ],
@@ -203,14 +190,6 @@ export const REWARDS = {
   ],
 };
 
-/* The "Offers, vouchers and rewards" tiles on the homepage.
-   PLACEHOLDER wording: make sure it matches what you really offer. */
-export const PROMOS = [
-  { title: "Offers & deals", text: "Members-only perks and seasonal deals at places we love.", href: "offers.html", cta: "See offers" },
-  { title: "Gift vouchers", text: "Give someone a great night out.", href: "vouchers.html", cta: "Buy a voucher" },
-  { title: "Chillingz Rewards", text: "Earn points as you explore and unlock treats.", href: "rewards.html", cta: "How it works" },
-];
-
 /* Short text about the company, shown in the footer */
 export const SITE = {
   name: "Chillingz",
@@ -219,17 +198,6 @@ export const SITE = {
   appStoreUrl: "https://apps.apple.com/gb/app/chillingz/id6766254665",
   playStoreUrl: "https://play.google.com/store/apps/details?id=com.chillingz.app",
 };
-
-/* Offers & deals page. Only add REAL offers that the venue has agreed to.
-   While this list is empty, the page says there are no offers right now.
-   Example:
-     { title: "2-for-1 cocktails before 7pm", venue: "Venue name",
-       listingId: "the listing's Firebase ID", ends: "2026-12-31",
-       details: "Mon–Thu only. Show this page at the bar." },          */
-export const OFFERS = [];
-
-/* Gift voucher amounts (in pounds) offered on the vouchers page */
-export const VOUCHER_AMOUNTS = [25, 50, 75, 100];
 
 /* Questions and answers for the FAQs page. Keep these matching your terms. */
 export const FAQS = [
@@ -263,7 +231,6 @@ export const FAQS = [
    "List your venue" link in the footer. */
 export const CONTACT_TOPICS = [
   { id: "general", label: "General question" },
-  { id: "vouchers", label: "Gift vouchers" },
   { id: "list-venue", label: "List my venue or event" },
   { id: "press", label: "Press & partnerships" },
   { id: "privacy", label: "My data & privacy" },

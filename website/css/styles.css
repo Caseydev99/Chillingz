@@ -31,25 +31,25 @@
    -------------------------------------------------------------------------- */
 :root {
   /* Brand colours taken from the Chillingz app */
-  --brand: #7925c7;
-  --brand-strong: #5f1aa0;          /* darker purple for text on light backgrounds */
-  --brand-soft: #f0e5fa;            /* very light purple for chips and highlights */
+  --brand: #b277f0;
+  --brand-strong: #cfa6ff;          /* light purple for text on the dark background */
+  --brand-soft: #3b1560;            /* deep purple for chips and highlights */
   --brand-gradient: linear-gradient(90deg, #9f3af2, #7925c7);
   --accent-gradient: linear-gradient(90deg, #f661f8, #79e8ec);
 
-  /* Light mode (default) */
-  --bg: #fcfaff;
-  --surface: #ffffff;                /* cards, header, pop-ups */
-  --surface-2: #f5effb;              /* slightly darker panels */
-  --text: #1b1025;
-  --text-muted: #5b4f66;
-  --border: #e3d8ef;
-  --focus: #7925c7;
-  --error: #b42318;
-  --success: #067647;
-  --star: #9a5b00;                   /* rating stars, dark enough to see on white */
-  --shadow: 0 6px 24px rgba(45, 13, 71, 0.10);
-  --overlay: rgba(20, 6, 33, 0.55);  /* dark see-through layer behind pop-ups */
+  /* Page colours: the site always uses the dark purple theme */
+  --bg: #1a0829;
+  --surface: #2d0d47;                /* cards, header, pop-ups */
+  --surface-2: #3a1259;              /* slightly darker panels */
+  --text: #f7f0ff;
+  --text-muted: #cdbfdc;
+  --border: #4a1f6e;
+  --focus: #e3c6ff;
+  --error: #ff8a80;
+  --success: #6ce9a6;
+  --star: #f5a623;                   /* rating stars, bright enough to see on dark */
+  --shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  --overlay: rgba(0, 0, 0, 0.65);  /* dark see-through layer behind pop-ups */
 
   /* Sizes */
   --radius: 14px;
@@ -66,31 +66,8 @@
   --text-xl: clamp(1.5rem, 1.25rem + 1.1vw, 2.2rem);
   --text-2xl: clamp(2rem, 1.5rem + 2.4vw, 3.6rem);
 
-  color-scheme: light;
+  color-scheme: dark;
 }
-
-/* Dark mode: used when the visitor's phone or computer is set to dark mode */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --brand: #b277f0;                /* lighter purple so it is readable on dark */
-    --brand-strong: #cfa6ff;
-    --brand-soft: #3b1560;
-    --bg: #1a0829;
-    --surface: #2d0d47;
-    --surface-2: #3a1259;
-    --text: #f7f0ff;
-    --text-muted: #cdbfdc;
-    --border: #4a1f6e;
-    --focus: #e3c6ff;
-    --error: #ff8a80;
-    --success: #6ce9a6;
-    --star: #f5a623;
-    --shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
-    --overlay: rgba(0, 0, 0, 0.65);
-    color-scheme: dark;
-  }
-}
-
 
 /* --------------------------------------------------------------------------
    2. Basic reset and page defaults
@@ -749,7 +726,7 @@ a.chip {
   }
 
   .header-search {
-    flex: 0 1 280px;
+    flex: 1 1 300px;            /* room for "How do you wanna chill today?" */
     min-width: 160px;
   }
 }
@@ -1535,6 +1512,35 @@ a.chip {
   position: absolute;
   right: 6px;
   min-height: 44px;
+}
+
+/* Phones: the Search button goes under the box, so the placeholder
+   "How do you wanna chill today?" has room to show in full */
+@media (max-width: 479px) {
+  .hero-search {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .hero-search .input {
+    padding-right: 14px;
+  }
+
+  .hero-search .icon {
+    top: 18px;                    /* middle of the 56px box, not the whole form */
+  }
+
+  .hero-search .btn {
+    position: static;
+    width: 100%;
+  }
+}
+
+/* The smallest phones: slightly smaller placeholder so it still fits */
+@media (max-width: 359px) {
+  .search-form .input::placeholder {
+    font-size: 15px;
+  }
 }
 
 .quick-searches {

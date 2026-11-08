@@ -105,7 +105,7 @@ service cloud.firestore {
             'topic', 'name', 'email', 'phone', 'message', 'details', 'userId',
             'source', 'createdAt'
           ])
-          && data.topic in ['general', 'vouchers', 'list-venue', 'press', 'privacy']
+          && data.topic in ['general', 'list-venue', 'press', 'privacy']
           && data.name is string && data.name.size() > 0 && data.name.size() <= 100
           && data.email is string && data.email.matches('^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$') && data.email.size() <= 200
           && data.phone is string && data.phone.size() <= 30
