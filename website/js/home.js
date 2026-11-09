@@ -9,10 +9,10 @@
    ========================================================================== */
 
 import { HOME, GUIDES, CATEGORIES, CITIES } from "./data.js";
-import { escapeHtml } from "./utils.js";
+import { escapeHtml, storage } from "./utils.js";
 import { getCity, appStoreLinksHtml } from "./site.js";
 import { getRecentSearches, updateHeartButtons } from "./favourites.js";
-import { loadContent, listingsForCity, inCategory, trending, newest, eventTickets, topRated, guideListings, detailUrl } from "./content.js";
+import { loadContent, listingsForCity, trending, newest, eventTickets, guideListings, detailUrl } from "./content.js";
 import { cardRow, listingImage } from "./cards.js";
 
 /* Shortcut: find one element on the page. */
@@ -53,7 +53,6 @@ function renderCategories(content, listings) {
     // If the category has no photo of its own, borrow one from its listings
     const fallback = listings.find((listing) => listing.category === category.slug && listing.image);
     const image = fromFirebase?.image ?? fallback?.image;
-    const count = listings.filter((listing) => inCategory(listing, category.slug)).length;
 
     return `
       <li>
@@ -61,7 +60,6 @@ function renderCategories(content, listings) {
           ${image ? listingImage({ image }, { sizes: "(min-width: 1024px) 16vw, (min-width: 600px) 30vw, 45vw" }) : '<div class="card-media card-media-empty"></div>'}
           <span class="category-label">
             <strong>${escapeHtml(category.name)}</strong>
-            <span>${count ? `${count} ${count === 1 ? "place" : "places"}` : "Coming soon"}</span>
           </span>
         </a>
       </li>`;
@@ -148,7 +146,6 @@ async function renderListings() {
 
     renderCategories(content, listings);
     $('[data-row="trending"]').innerHTML = cardRow(trending(listings, 8), { id: "trending-title" });
-    $('[data-row="top10"]').innerHTML = cardRow(topRated(listings), { id: "top10-title", rankStart: 1 });
     $('[data-row="new"]').innerHTML = cardRow(newest(listings, 8), { id: "new-title" });
     $('[data-row="events"]').innerHTML = cardRow(eventTickets(listings, 8), { id: "events-title" });
     renderGuides(listings);
@@ -177,7 +174,6 @@ document.addEventListener("chillingz:city", renderListings);
 
 // "Show me London" button in the "coming soon" message
 $("[data-switch-london]").addEventListener("click", () => {
-  const select = document.querySelector("[data-city-select]");
-  select.value = "london";
-  select.dispatchEvent(new Event("change"));
+  storage.set("chillingz.city", "london");
+  renderListings();
 });

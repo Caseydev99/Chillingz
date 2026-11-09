@@ -409,8 +409,7 @@ a.chip {
   border-bottom: 1px solid var(--border);
 }
 
-/* The header items sit in one row. On phones the search bar wraps onto its
-   own line underneath (see .header-search). */
+/* The header items sit in one row. */
 .header-bar {
   display: flex;
   flex-wrap: wrap;
@@ -431,17 +430,18 @@ a.chip {
   width: auto;
 }
 
-/* City switcher (a drop-down list) */
+/* City label (London) */
 .city-switcher {
   position: relative;
   display: inline-flex;
   align-items: center;
 }
 
-.city-switcher select {
-  appearance: none;
+.city-switcher .city-name {
+  display: inline-flex;
+  align-items: center;
   min-height: var(--tap);
-  padding: 8px 34px 8px 34px;
+  padding: 8px 16px 8px 34px;
   border: 1px solid var(--border);
   border-radius: 999px;
   background: var(--surface);
@@ -449,11 +449,9 @@ a.chip {
   font: inherit;
   font-size: var(--text-sm);
   font-weight: 600;
-  cursor: pointer;
 }
 
-.city-switcher .icon-pin,
-.city-switcher .icon-caret {
+.city-switcher .icon-pin {
   position: absolute;
   pointer-events: none;
   width: 18px;
@@ -462,7 +460,6 @@ a.chip {
 }
 
 .city-switcher .icon-pin { left: 10px; }
-.city-switcher .icon-caret { right: 10px; }
 
 /* In the header on phones the city switcher lives in the menu drawer */
 .header-bar .city-switcher {
@@ -474,7 +471,7 @@ a.chip {
   display: none;
 }
 
-/* These keep their size; only the search box gets narrower when space is tight */
+/* These keep their size when space is tight */
 .logo,
 .city-switcher,
 .header-account,
@@ -496,13 +493,6 @@ a.chip {
   overflow: hidden;
   clip: rect(0 0 0 0);
   white-space: nowrap;
-}
-
-/* Search bar: sits under the header bar on phones and stays on screen */
-.header-search {
-  order: 10;                    /* move to the end of the row… */
-  flex-basis: 100%;             /* …and take a full line of its own */
-  padding-bottom: 10px;
 }
 
 .search-form {
@@ -611,13 +601,6 @@ a.chip {
     flex-wrap: nowrap;
     column-gap: 12px;
   }
-
-  .header-search {
-    order: 0;
-    flex: 1 1 200px;
-    max-width: 360px;
-    padding-bottom: 0;
-  }
 }
 
 /* Desktop: full menu in the header, menu button hidden */
@@ -725,9 +708,8 @@ a.chip {
     font-size: var(--text-sm);
   }
 
-  .header-search {
-    flex: 1 1 300px;            /* room for "How do you wanna chill today?" */
-    min-width: 160px;
+  .header-account {
+    margin-left: auto;          /* keep the login button on the right */
   }
 }
 
@@ -781,7 +763,7 @@ a.chip {
   margin-bottom: 16px;
 }
 
-.drawer-body .city-switcher select {
+.drawer-body .city-switcher .city-name {
   width: 100%;
 }
 
@@ -1359,10 +1341,6 @@ a.chip {
   font-weight: 800;
 }
 
-.top10 .card-body {
-  padding-top: 26px;
-}
-
 /* Heart button on the photo (sits above the stretched card link) */
 .heart-btn {
   position: absolute;
@@ -1419,11 +1397,6 @@ a.chip {
   .card-row > li:nth-child(n + 7) {
     display: none;
   }
-
-  /* …except the Top 10, which always shows all ten */
-  .top10 .card-row > li:nth-child(n + 7) {
-    display: block;
-  }
 }
 
 @media (min-width: 1200px) {
@@ -1434,14 +1407,6 @@ a.chip {
   .card-row > li:nth-child(n + 7) {
     display: block;
   }
-
-  .top10 .card-row {
-    grid-template-columns: repeat(5, 1fr);
-  }
-}
-
-.top10 {
-  background: var(--surface-2);
 }
 
 

@@ -30,7 +30,6 @@ export const CATEGORIES = [
    open a small drop-down. */
 export const MAIN_MENU = [
   { label: "Explore", megaMenu: true },
-  { label: "Events", href: "search.html?category=events" },
   { label: "Guides", href: "guides.html" },
 ];
 
