@@ -4,7 +4,7 @@
    The homepage HTML already has the headings and empty boxes. This file
    loads the listings (content.js) and puts cards into each box:
      categories, Trending, Top 10, New on Chillingz, Hot events, Guides,
-     the photo gallery and the app banner.
+     and the app banner.
    When the visitor picks another city in the header, it all redraws.
    ========================================================================== */
 
@@ -12,7 +12,7 @@ import { HOME, GUIDES, CATEGORIES, CITIES } from "./data.js";
 import { escapeHtml, storage } from "./utils.js";
 import { getCity, appStoreLinksHtml } from "./site.js";
 import { getRecentSearches, updateHeartButtons } from "./favourites.js";
-import { loadContent, listingsForCity, trending, newest, eventTickets, guideListings, detailUrl } from "./content.js";
+import { loadContent, listingsForCity, trending, newest, eventTickets, guideListings } from "./content.js";
 import { cardRow, listingImage } from "./cards.js";
 
 /* Shortcut: find one element on the page. */
@@ -89,38 +89,12 @@ function renderGuides(listings) {
         <article class="guide-card">
           ${listingImage(cover, { sizes: "(min-width: 1024px) 33vw, 90vw" })}
           <div class="card-body">
-            <p class="chip">${picks.length} picks</p>
             <h3 class="card-title"><a href="article.html?guide=${guide.slug}">${escapeHtml(guide.title)}</a></h3>
             <p class="card-details">${escapeHtml(guide.intro)}</p>
           </div>
         </article>
       </li>`;
     })
-    .join("");
-}
-
-
-/* --------------------------------------------------------------------------
-   Photo gallery: a mosaic of the best photos, each linking to its listing
-   -------------------------------------------------------------------------- */
-function renderGallery(listings) {
-  // Skip listings already shown in "Trending", and photos already used
-  // (several listings in Firebase share the same photo)
-  const shown = new Set(trending(listings, 8).map((listing) => listing.id));
-  const usedPhotos = new Set();
-  const photos = trending(listings, 200).filter((listing) => {
-    if (!listing.image || shown.has(listing.id) || usedPhotos.has(listing.image.fingerprint)) return false;
-    usedPhotos.add(listing.image.fingerprint);
-    return true;
-  }).slice(0, 5);
-  $("[data-gallery]").innerHTML = photos
-    .map((listing, index) => `
-      <li class="${index === 0 ? "gallery-large" : ""}">
-        <a href="${detailUrl(listing)}">
-          ${listingImage(listing, { sizes: index === 0 ? "(min-width: 768px) 50vw, 100vw" : "(min-width: 768px) 25vw, 50vw" })}
-          <span class="gallery-caption">${escapeHtml(listing.title)}</span>
-        </a>
-      </li>`)
     .join("");
 }
 
@@ -149,7 +123,6 @@ async function renderListings() {
     $('[data-row="new"]').innerHTML = cardRow(newest(listings, 8), { id: "new-title" });
     $('[data-row="events"]').innerHTML = cardRow(eventTickets(listings, 8), { id: "events-title" });
     renderGuides(listings);
-    renderGallery(listings);
     updateHeartButtons();
   } catch (error) {
     console.error(error);

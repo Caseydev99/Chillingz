@@ -83,15 +83,16 @@ function pickCovers(articles) {
    guides.html
    -------------------------------------------------------------------------- */
 function articleCard(article) {
+  // Blog posts show their date; guides show no label
   const label = article.kind === "post"
     ? new Date(article.post.date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })
-    : `${article.picks.length} picks`;
+    : "";
   return `
     <li>
       <article class="guide-card">
         ${listingImage(article.cover ?? {}, { sizes: "(min-width: 1024px) 33vw, 90vw" })}
         <div class="card-body">
-          <p class="chip">${escapeHtml(label)}</p>
+          ${label ? `<p class="chip">${escapeHtml(label)}</p>` : ""}
           <h3 class="card-title"><a href="${article.url}">${escapeHtml(article.title)}</a></h3>
           <p class="card-details">${escapeHtml(article.intro)}</p>
         </div>
