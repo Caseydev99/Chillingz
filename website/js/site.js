@@ -45,39 +45,16 @@ export function getCity() {
   return CITIES.some((city) => city.id === saved) ? saved : CITIES[0].id;
 }
 
-/* Builds the HTML for one city drop-down. "idSuffix" keeps the ids unique,
-   because the switcher appears twice (header and mobile menu). */
-function citySwitcherHtml(idSuffix) {
-  const selected = getCity();
-  const options = CITIES.map(
-    (city) =>
-      `<option value="${city.id}" ${city.id === selected ? "selected" : ""}>${escapeHtml(city.name)}</option>`,
-  ).join("");
+/* The city label in the header and mobile menu. London is the only city,
+   so it's a label rather than a drop-down. */
+function citySwitcherHtml() {
+  const city = CITIES.find((item) => item.id === getCity());
   return `
     <div class="city-switcher">
-      <label class="visually-hidden" for="city-${idSuffix}">Choose your city</label>
       ${ICONS.pin}
-      <select id="city-${idSuffix}" data-city-select>${options}</select>
-      ${ICONS.caret}
+      <span class="city-name">${escapeHtml(city.name)}</span>
     </div>`;
 }
-
-/* When a city is picked: remember it, keep both drop-downs in step, and tell
-   the page so it can reload its listings. */
-function setUpCitySwitchers() {
-  document.querySelectorAll("[data-city-select]").forEach((select) => {
-    select.addEventListener("change", () => {
-      storage.set("chillingz.city", select.value);
-      document.querySelectorAll("[data-city-select]").forEach((other) => {
-        other.value = select.value;
-      });
-      const city = CITIES.find((item) => item.id === select.value);
-      showToast(`Showing ${city.name}`);
-      document.dispatchEvent(new CustomEvent("chillingz:city", { detail: city }));
-    });
-  });
-}
-
 
 /* --------------------------------------------------------------------------
    Header
@@ -137,9 +114,6 @@ function renderHeader() {
   const slot = document.querySelector("[data-site-header]");
   if (!slot) return;
 
-  // Keep whatever the visitor last searched for in the box
-  const query = new URLSearchParams(location.search).get("q") ?? "";
-
   slot.outerHTML = `
     <a class="skip-link" href="#main">Skip to content</a>
     <header class="site-header">
@@ -155,16 +129,8 @@ function renderHeader() {
           </picture>
         </a>
 
-        ${citySwitcherHtml("header")}
+        ${citySwitcherHtml()}
         ${mainMenuHtml()}
-
-        <div class="header-search">
-          <form class="search-form" action="search.html" method="get" role="search" data-search-form>
-            <label class="visually-hidden" for="site-search">Search venues and events</label>
-            ${ICONS.search}
-            <input class="input" id="site-search" name="q" type="search" placeholder="How do you wanna chill today?" value="${escapeHtml(query)}" autocomplete="off">
-          </form>
-        </div>
 
         <!-- auth.js fills this with "Log in / Sign up" or the account menu -->
         <div class="header-account" data-account-slot>
@@ -182,7 +148,7 @@ function renderHeader() {
         <button class="icon-btn" type="button" aria-label="Close menu" data-drawer-close>${ICONS.close}</button>
       </div>
       <div class="drawer-body">
-        ${citySwitcherHtml("drawer")}
+        ${citySwitcherHtml()}
         <nav class="drawer-nav" aria-label="Mobile menu">
           <ul>
             <li><a href="index.html">Home</a></li>
@@ -436,7 +402,6 @@ function setUpCookieBanner() {
    -------------------------------------------------------------------------- */
 renderHeader();
 renderFooter();
-setUpCitySwitchers();
 setUpDrawer();
 setUpDropdowns();
 setUpSearch();

@@ -4,15 +4,15 @@
    The homepage HTML already has the headings and empty boxes. This file
    loads the listings (content.js) and puts cards into each box:
      categories, Trending, Top 10, New on Chillingz, Hot events, Guides,
-     the photo gallery and the app banner.
+     and the app banner.
    When the visitor picks another city in the header, it all redraws.
    ========================================================================== */
 
 import { HOME, GUIDES, CATEGORIES, CITIES } from "./data.js";
-import { escapeHtml } from "./utils.js";
+import { escapeHtml, storage } from "./utils.js";
 import { getCity, appStoreLinksHtml } from "./site.js";
 import { getRecentSearches, updateHeartButtons } from "./favourites.js";
-import { loadContent, listingsForCity, inCategory, trending, newest, eventTickets, topRated, guideListings, detailUrl } from "./content.js";
+import { loadContent, listingsForCity, trending, newest, eventTickets, guideListings } from "./content.js";
 import { cardRow, listingImage } from "./cards.js";
 
 /* Shortcut: find one element on the page. */
@@ -53,7 +53,6 @@ function renderCategories(content, listings) {
     // If the category has no photo of its own, borrow one from its listings
     const fallback = listings.find((listing) => listing.category === category.slug && listing.image);
     const image = fromFirebase?.image ?? fallback?.image;
-    const count = listings.filter((listing) => inCategory(listing, category.slug)).length;
 
     return `
       <li>
@@ -61,7 +60,6 @@ function renderCategories(content, listings) {
           ${image ? listingImage({ image }, { sizes: "(min-width: 1024px) 16vw, (min-width: 600px) 30vw, 45vw" }) : '<div class="card-media card-media-empty"></div>'}
           <span class="category-label">
             <strong>${escapeHtml(category.name)}</strong>
-            <span>${count ? `${count} ${count === 1 ? "place" : "places"}` : "Coming soon"}</span>
           </span>
         </a>
       </li>`;
@@ -91,38 +89,12 @@ function renderGuides(listings) {
         <article class="guide-card">
           ${listingImage(cover, { sizes: "(min-width: 1024px) 33vw, 90vw" })}
           <div class="card-body">
-            <p class="chip">${picks.length} picks</p>
             <h3 class="card-title"><a href="article.html?guide=${guide.slug}">${escapeHtml(guide.title)}</a></h3>
             <p class="card-details">${escapeHtml(guide.intro)}</p>
           </div>
         </article>
       </li>`;
     })
-    .join("");
-}
-
-
-/* --------------------------------------------------------------------------
-   Photo gallery: a mosaic of the best photos, each linking to its listing
-   -------------------------------------------------------------------------- */
-function renderGallery(listings) {
-  // Skip listings already shown in "Trending", and photos already used
-  // (several listings in Firebase share the same photo)
-  const shown = new Set(trending(listings, 8).map((listing) => listing.id));
-  const usedPhotos = new Set();
-  const photos = trending(listings, 200).filter((listing) => {
-    if (!listing.image || shown.has(listing.id) || usedPhotos.has(listing.image.fingerprint)) return false;
-    usedPhotos.add(listing.image.fingerprint);
-    return true;
-  }).slice(0, 5);
-  $("[data-gallery]").innerHTML = photos
-    .map((listing, index) => `
-      <li class="${index === 0 ? "gallery-large" : ""}">
-        <a href="${detailUrl(listing)}">
-          ${listingImage(listing, { sizes: index === 0 ? "(min-width: 768px) 50vw, 100vw" : "(min-width: 768px) 25vw, 50vw" })}
-          <span class="gallery-caption">${escapeHtml(listing.title)}</span>
-        </a>
-      </li>`)
     .join("");
 }
 
@@ -148,11 +120,9 @@ async function renderListings() {
 
     renderCategories(content, listings);
     $('[data-row="trending"]').innerHTML = cardRow(trending(listings, 8), { id: "trending-title" });
-    $('[data-row="top10"]').innerHTML = cardRow(topRated(listings), { id: "top10-title", rankStart: 1 });
     $('[data-row="new"]').innerHTML = cardRow(newest(listings, 8), { id: "new-title" });
     $('[data-row="events"]').innerHTML = cardRow(eventTickets(listings, 8), { id: "events-title" });
     renderGuides(listings);
-    renderGallery(listings);
     updateHeartButtons();
   } catch (error) {
     console.error(error);
@@ -177,7 +147,6 @@ document.addEventListener("chillingz:city", renderListings);
 
 // "Show me London" button in the "coming soon" message
 $("[data-switch-london]").addEventListener("click", () => {
-  const select = document.querySelector("[data-city-select]");
-  select.value = "london";
-  select.dispatchEvent(new Event("change"));
+  storage.set("chillingz.city", "london");
+  renderListings();
 });
