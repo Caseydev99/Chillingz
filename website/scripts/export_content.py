@@ -341,11 +341,14 @@ def links(data, posts, events):
     def named(*names):
         return first_text([source.get(name) for source in (data, posts, events) for name in names])
 
-    return {
+    found = {
         "website": first_text([from_list("website"), named("websiteLink", "websiteUrl", "website"), direct("website")]),
         "map": first_text([from_list("map"), named("mapLink", "googleMapLink", "googleMapsLink", "googleMapsUrl", "mapsUrl", "google_maps_url"), direct("map")]),
         "ticket": first_text([from_list("ticket"), named("ticketLink", "ticketUrl", "bookingLink", "bookingUrl"), direct("ticket")]),
     }
+    # Only real web links go on the site: a "javascript:" link would run code
+    # on the page when clicked.
+    return {kind: url if re.match(r"https?://", url, re.I) else "" for kind, url in found.items()}
 
 
 def iso_date(value):

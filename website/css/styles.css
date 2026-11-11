@@ -2747,3 +2747,21 @@ textarea.input {
     scroll-behavior: auto !important;
   }
 }
+
+/* Smooth scrolling (js/motion.js) — the rules Lenis needs to work. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
