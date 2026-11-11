@@ -7,6 +7,7 @@
      3. makes the mobile menu, drop-downs and city switcher work
      4. shows the cookie banner the first time someone visits
      5. starts the login system (auth.js) and favourites (favourites.js)
+     6. starts smooth scrolling and scroll animations (motion.js)
 
    A page only needs these three placeholders for it all to appear:
      <div data-site-header></div>  <main id="main">…</main>  <div data-site-footer></div>
@@ -25,6 +26,7 @@ import { storage, escapeHtml, showToast, ICONS } from "./utils.js";
 import { initAuth, openAuthModal } from "./auth.js";
 import { initFavourites, addRecentSearch } from "./favourites.js";
 import { newsletterHtml, initNewsletter } from "./newsletter.js";
+import "./motion.js";
 
 
 /* Works out which page we are on (e.g. "search.html"), used to highlight the

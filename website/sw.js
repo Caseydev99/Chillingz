@@ -33,6 +33,7 @@ const CORE_FILES = [
   "js/favourites.js",
   "js/firebase.js",
   "js/newsletter.js",
+  "js/motion.js",
   "js/content.js",
   "js/cards.js",
   "js/home.js",
