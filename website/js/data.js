@@ -81,7 +81,7 @@ export const TRUST = {
 
 /* The words at the top of the homepage */
 export const HOME = {
-  heroTitle: "Find your next favourite night out",
+  heroTitle: "Stop scrolling and searching. Start Chilling",
   heroText: "Restaurants, games, gigs, wellness and meetups across London. Browse and save your favourites — no sign-up needed.",
   // Little shortcut buttons under the search box
   quickSearches: ["Brunch", "Competitive socialising", "Rooftop", "Sauna", "R&B", "Coworking"],
