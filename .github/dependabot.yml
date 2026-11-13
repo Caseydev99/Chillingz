@@ -1,0 +1,16 @@
+# Dependabot checks the project's packages for known security problems each
+# week and opens a pull request when an update is available.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /Chillingz-main/functions
+    schedule:
+      interval: weekly
+  - package-ecosystem: pub
+    directory: /Chillingz-main
+    schedule:
+      interval: weekly
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

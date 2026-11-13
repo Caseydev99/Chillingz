@@ -28,12 +28,27 @@ let authPromise = null;
 let firestorePromise = null;
 let functionsPromise = null;
 
+/* Bot protection (Firebase App Check). It is OFF while this is empty.
+   To turn it on: in the Firebase console open App Check, register this web
+   app with reCAPTCHA v3, and paste the site key here. Only switch on
+   "Enforce" in the console once the phone app sends App Check too, or the
+   app will be locked out. */
+const APP_CHECK_SITE_KEY = "";
+
 /* Starts the Firebase app (only once). */
 function loadApp() {
   if (!appPromise) {
-    appPromise = import(`${FIREBASE_CDN}/firebase-app.js`).then((module) =>
-      module.initializeApp(firebaseConfig),
-    );
+    appPromise = import(`${FIREBASE_CDN}/firebase-app.js`).then(async (module) => {
+      const app = module.initializeApp(firebaseConfig);
+      if (APP_CHECK_SITE_KEY) {
+        const { initializeAppCheck, ReCaptchaV3Provider } = await import(`${FIREBASE_CDN}/firebase-app-check.js`);
+        initializeAppCheck(app, {
+          provider: new ReCaptchaV3Provider(APP_CHECK_SITE_KEY),
+          isTokenAutoRefreshEnabled: true,
+        });
+      }
+      return app;
+    });
   }
   return appPromise;
 }

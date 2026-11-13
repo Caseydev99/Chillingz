@@ -7,6 +7,8 @@ const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const { defineSecret } = require("firebase-functions/params");
 const { logger } = require("firebase-functions");
 const nodemailer = require("nodemailer");
+const { createHash } = require("node:crypto");
+const { nextSentTimes } = require("./throttle");
 
 // Chillingz app theme (kept in sync with lib/core/constants/app_colors.dart).
 const THEME = {
@@ -61,6 +63,13 @@ exports.sendPasswordReset = onCall(
         return { success: true };
       }
       throw new HttpsError("internal", "Could not generate reset link.");
+    }
+
+    // Anyone can call this function, so cap the emails per address. A refused
+    // request answers like a sent one, so it reveals nothing about the account.
+    if (!(await passwordResetAllowed(email))) {
+      logger.warn("Password reset throttled");
+      return { success: true };
     }
 
     const transporter = nodemailer.createTransport({
@@ -324,6 +333,21 @@ exports.sendNotificationOnCreate = onDocumentCreated(
     ]);
   },
 );
+
+// Records this reset email against the address (stored as a hash, in a
+// collection only admins can read) and says whether it may be sent.
+function passwordResetAllowed(email) {
+  const id = createHash("sha256").update(email.toLowerCase()).digest("hex");
+  const ref = db.collection("passwordResetThrottle").doc(id);
+  return db.runTransaction(async (transaction) => {
+    const snapshot = await transaction.get(ref);
+    const sentAt = nextSentTimes((snapshot.data() || {}).sentAt, Date.now());
+    if (sentAt) {
+      transaction.set(ref, { sentAt });
+    }
+    return Boolean(sentAt);
+  });
+}
 
 function firstText(values) {
   for (const value of values) {
